@@ -1,0 +1,14 @@
+build
+dist
+coverage
+node_modules
+.DS_STORE
+.nyc_output
+.idea
+.vscode/
+*.sublime-project
+*.sublime-workspace
+*.log
+yarn.lock
+shrinkwrap.yaml
+# package-lock.json

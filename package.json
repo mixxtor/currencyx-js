@@ -1,0 +1,83 @@
+{
+  "name": "@mixxtor/currencyx-js",
+  "version": "1.0.0-beta.1",
+  "description": "Modern TypeScript currency converter with type inference and multiple providers (Google Finance, Fixer.io). Framework agnostic with clean architecture.",
+  "type": "module",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:ui": "vitest --ui",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist",
+    "prebuild": "npm run clean && npm run typecheck",
+    "prepublishOnly": "npm run build && npm run test",
+    "release": "release-it",
+    "release:patch": "release-it patch",
+    "release:minor": "release-it minor",
+    "release:major": "release-it major",
+    "release:dry": "release-it --dry-run",
+    "release:beta": "release-it --preRelease=beta",
+    "release:alpha": "release-it --preRelease=alpha",
+    "version:check": "npm version --help"
+  },
+  "keywords": [
+    "currency",
+    "converter",
+    "exchange-rates",
+    "typescript",
+    "type-inference",
+    "nodejs",
+    "google-finance",
+    "fixer-io",
+    "multi-provider",
+    "type-safe"
+  ],
+  "author": "Mixxtor",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mixxtor/currencyx-js.git"
+  },
+  "bugs": {
+    "url": "https://github.com/mixxtor/currencyx-js/issues"
+  },
+  "homepage": "https://github.com/mixxtor/currencyx-js#readme",
+  "devDependencies": {
+    "@release-it/conventional-changelog": "^8.0.0",
+    "@types/node": "^20.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^9.0.0",
+    "release-it": "^17.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0"
+  },
+  "peerDependencies": {
+    "typescript": ">=4.5.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

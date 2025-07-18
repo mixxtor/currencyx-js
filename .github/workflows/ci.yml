@@ -1,0 +1,98 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master, develop ]
+    paths:
+      - 'packages/currencyx-js/**'
+  pull_request:
+    branches: [ main, master, develop ]
+    paths:
+      - 'packages/currencyx-js/**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18, 20, 22]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+          cache-dependency-path: packages/currencyx-js/package-lock.json
+
+      - name: Install dependencies
+        working-directory: packages/currencyx-js
+        run: npm ci
+
+      - name: Run linting
+        working-directory: packages/currencyx-js
+        run: npm run lint
+
+      - name: Run type checking
+        working-directory: packages/currencyx-js
+        run: npm run typecheck
+
+      - name: Run tests
+        working-directory: packages/currencyx-js
+        run: npm run test --if-present
+
+      - name: Build package
+        working-directory: packages/currencyx-js
+        run: npm run build
+
+      - name: Test package functionality
+        working-directory: packages/currencyx-js
+        run: npx tsx test-fresh-package.ts
+
+  build-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        working-directory: packages/currencyx-js
+        run: npm ci
+
+      - name: Build and check exports
+        working-directory: packages/currencyx-js
+        run: |
+          npm run build
+          node -e "
+            const pkg = require('./dist/index.js');
+            console.log('✅ ESM import works');
+            console.log('Exports:', Object.keys(pkg));
+          "
+          node -e "
+            const pkg = require('./dist/index.cjs');
+            console.log('✅ CJS require works');
+            console.log('Exports:', Object.keys(pkg));
+          "
+
+      - name: Check TypeScript declarations
+        working-directory: packages/currencyx-js
+        run: |
+          node -e "
+            const fs = require('fs');
+            const dts = fs.readFileSync('./dist/index.d.ts', 'utf8');
+            if (dts.includes('export')) {
+              console.log('✅ TypeScript declarations generated');
+            } else {
+              throw new Error('❌ TypeScript declarations missing');
+            }
+          "
