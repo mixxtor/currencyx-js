@@ -15,7 +15,6 @@ import type {
 import type { CurrencyProviderContract } from '../contracts/currency_provider.js'
 import { GoogleFinanceProvider } from '../providers/google_finance.js'
 import { FixerProvider } from '../providers/fixer.js'
-import { DatabaseProvider } from '../providers/database.js'
 
 /**
  * Abstract Currency Service Interface
@@ -74,9 +73,6 @@ export class CurrencyService<T extends CurrencyConfig<Record<string, any>> = Cur
           break
         case 'fixer':
           provider = new FixerProvider(config)
-          break
-        case 'database':
-          provider = new DatabaseProvider(config)
           break
         default:
           // For custom providers, assume they are already instantiated
