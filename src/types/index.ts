@@ -1,5 +1,5 @@
 /**
- * Core Types for CurrencyX.js v2.0
+ * Core Types for CurrencyX.js
  * 
  * Based on existing currency provider structure
  */
