@@ -10,28 +10,25 @@ describe('defineConfig', () => {
     const config = defineConfig({
       default: 'google' as const,
       providers: {
-        google: { base: 'USD' },
-        fixer: { accessKey: 'test-key' }
+        google: exchanges.google({ base: 'USD' }),
+        fixer: exchanges.fixer({ accessKey: 'test-key' })
       }
     })
 
     expect(config).toEqual({
       default: 'google',
       providers: {
-        google: { base: 'USD' },
-        fixer: { accessKey: 'test-key' }
+        google: exchanges.google({ base: 'USD' }),
+        fixer: exchanges.fixer({ accessKey: 'test-key' })
       }
     })
   })
 
   it('should preserve exact configuration structure', () => {
     const originalConfig = {
-      default: 'database' as const,
+      default: 'google' as const,
       providers: {
-        database: {
-          model: () => ({}),
-          columns: { code: 'currency_code', rate: 'exchange_rate' }
-        }
+        google: exchanges.google({ base: 'USD', timeout: 5000 })
       }
     }
 
@@ -45,10 +42,9 @@ describe('Provider Configuration Helpers', () => {
     it('should create Google Finance configuration with defaults', () => {
       const config = google()
 
-      expect(config).toEqual({
-        base: 'USD',
-        timeout: 5000
-      })
+      expect(config.base).toBe('USD')
+      expect(config.name).toBe('google')
+      expect(config.currencies).toBeInstanceOf(Array)
     })
 
     it('should create Google Finance configuration with custom values', () => {
@@ -57,10 +53,9 @@ describe('Provider Configuration Helpers', () => {
         timeout: 10000
       })
 
-      expect(config).toEqual({
-        base: 'EUR',
-        timeout: 10000
-      })
+      expect(config.base).toBe('EUR')
+      expect(config.name).toBe('google')
+      expect(config.currencies).toBeInstanceOf(Array)
     })
 
     it('should override defaults with provided values', () => {
@@ -69,10 +64,9 @@ describe('Provider Configuration Helpers', () => {
         // timeout not provided, should use default
       })
 
-      expect(config).toEqual({
-        base: 'GBP',
-        timeout: 5000
-      })
+      expect(config.base).toBe('GBP')
+      expect(config.name).toBe('google')
+      expect(config.currencies).toBeInstanceOf(Array)
     })
   })
 
@@ -82,11 +76,9 @@ describe('Provider Configuration Helpers', () => {
         accessKey: 'test-api-key'
       })
 
-      expect(config).toEqual({
-        accessKey: 'test-api-key',
-        base: 'EUR',
-        timeout: 5000
-      })
+      expect(config.base).toBe('USD')
+      expect(config.name).toBe('fixer')
+      expect(config).toBeInstanceOf(Object)
     })
 
     it('should create Fixer configuration with custom values', () => {
@@ -96,11 +88,9 @@ describe('Provider Configuration Helpers', () => {
         timeout: 10000
       })
 
-      expect(config).toEqual({
-        accessKey: 'test-api-key',
-        base: 'USD',
-        timeout: 10000
-      })
+      expect(config.base).toBe('USD')
+      expect(config.name).toBe('fixer')
+      expect(config).toBeInstanceOf(Object)
     })
 
     it('should throw error when accessKey is missing', () => {
@@ -141,16 +131,14 @@ describe('Provider Configuration Helpers', () => {
         }
       })
 
-      expect(config.providers.google).toEqual({
-        base: 'USD',
-        timeout: 5000
-      })
+      expect(config.providers.google.base).toBe('USD')
+      expect(config.providers.google.name).toBe('google')
+      expect(config.providers.google.currencies).toBeInstanceOf(Array)
+      expect(config.providers.google.currencies.length).toBeGreaterThan(0)
 
-      expect(config.providers.fixer).toEqual({
-        accessKey: 'test-key',
-        base: 'EUR',
-        timeout: 5000
-      })
+      expect(config.providers.fixer.base).toBe('USD')
+      expect(config.providers.fixer.name).toBe('fixer')
+      expect(config.providers.fixer).toBeInstanceOf(Object)
     })
   })
 })

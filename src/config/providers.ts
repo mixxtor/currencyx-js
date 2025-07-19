@@ -5,6 +5,8 @@
  * Provides typed configuration helpers for each provider
  */
 
+import { FixerProvider } from '../providers/fixer.js'
+import { GoogleFinanceProvider } from '../providers/google_finance.js'
 import type { GoogleFinanceConfig, FixerConfig } from '../types/index.js'
 
 /**
@@ -20,12 +22,12 @@ import type { GoogleFinanceConfig, FixerConfig } from '../types/index.js'
  * })
  * ```
  */
-export function google(config: GoogleFinanceConfig = {}): GoogleFinanceConfig {
-  return {
+export function google(config: GoogleFinanceConfig = {}): GoogleFinanceProvider {
+  return new GoogleFinanceProvider({
     base: config.base || 'USD',
     timeout: config.timeout || 5000,
     ...config
-  }
+  })
 }
 
 /**
@@ -44,16 +46,16 @@ export function google(config: GoogleFinanceConfig = {}): GoogleFinanceConfig {
  * })
  * ```
  */
-export function fixer(config: FixerConfig): FixerConfig {
+export function fixer(config: FixerConfig): FixerProvider {
   if (!config.accessKey) {
     throw new Error('Fixer provider requires an accessKey')
   }
 
-  return {
-    base: config.base || 'EUR',
+  return new FixerProvider({
+    base: config.base || 'USD',
     timeout: config.timeout || 5000,
     ...config
-  }
+  })
 }
 
 

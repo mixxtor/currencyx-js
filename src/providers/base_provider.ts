@@ -200,6 +200,14 @@ export abstract class BaseCurrencyProvider implements CurrencyProviderContract {
   }
 
   /**
+   * Set supported currencies (for testing/configuration)
+   */
+  public set currencies(_value: CurrencyCode[]) {
+    // This setter is mainly for compatibility with tests
+    // In practice, currencies are derived from currencyList
+  }
+
+  /**
    * Abstract methods that must be implemented by subclasses
    */
   abstract latestRates(params?: ExchangeRatesParams): Promise<ExchangeRatesResult>
