@@ -12,7 +12,8 @@ import type {
   HealthCheckResult,
   CurrencyCode,
   ConvertParams,
-  ExchangeRatesParams
+  ExchangeRatesParams,
+  CurrencyProviders
 } from '../types/index.js'
 import type { CurrencyProviderContract } from '../contracts/currency_provider.js'
 import { GoogleFinanceProvider } from '../providers/google_finance.js'
@@ -21,7 +22,7 @@ import { FixerProvider } from '../providers/fixer.js'
 /**
  * Abstract Currency Service Interface
  */
-export abstract class CurrencyServiceAbstract<T extends CurrencyConfig<Record<string, any>> = CurrencyConfig<Record<string, any>>> {
+export abstract class CurrencyServiceAbstract<T extends CurrencyConfig<CurrencyProviders> = CurrencyConfig<CurrencyProviders>> {
   // Core methods with object parameters for clarity
   abstract convert(params: ConvertParams): Promise<ConversionResult>
   abstract getExchangeRates(params?: ExchangeRatesParams): Promise<ExchangeRatesResult>
@@ -59,25 +60,25 @@ export abstract class CurrencyServiceAbstract<T extends CurrencyConfig<Record<st
 /**
  * Main Currency Service Implementation
  */
-export class CurrencyService<T extends CurrencyConfig<Record<string, any>> = CurrencyConfig<Record<string, any>>>
+export class CurrencyService<T extends CurrencyConfig<CurrencyProviders> = CurrencyConfig<CurrencyProviders>>
   extends CurrencyServiceAbstract<T> {
 
-  private providers: Map<string, CurrencyProviderContract> = new Map()
-  private currentProvider?: string
-  private config: T
+  #providers: Map<string, CurrencyProviderContract> = new Map()
+  #currentProvider?: string
+  #config: T
 
   constructor(config: T) {
     super()
-    this.config = config
-    this.initializeProviders()
-    this.currentProvider = String(config.default)
+    this.#config = config
+    this.#initializeProviders()
+    this.#currentProvider = String(config.default)
   }
 
   /**
    * Initialize providers based on configuration
    */
-  private initializeProviders(): void {
-    const providers = this.config.providers
+  #initializeProviders(): void {
+    const providers = this.#config.providers
 
     for (const [name, config] of Object.entries(providers)) {
       let provider: CurrencyProviderContract
@@ -87,7 +88,7 @@ export class CurrencyService<T extends CurrencyConfig<Record<string, any>> = Cur
           provider = new GoogleFinanceProvider(config)
           break
         case 'fixer':
-          provider = new FixerProvider(config)
+          provider = new FixerProvider(config as any)
           break
         default:
           // For custom providers, assume they are already instantiated
@@ -98,7 +99,7 @@ export class CurrencyService<T extends CurrencyConfig<Record<string, any>> = Cur
           }
       }
 
-      this.providers.set(name, provider)
+      this.#providers.set(name, provider)
     }
   }
 
@@ -129,36 +130,36 @@ export class CurrencyService<T extends CurrencyConfig<Record<string, any>> = Cur
    */
   use(provider: GetProviderNames<T>): void {
     const providerName = String(provider)
-    if (!this.providers.has(providerName)) {
+    if (!this.#providers.has(providerName)) {
       throw new Error(`Provider '${providerName}' is not configured`)
     }
-    this.currentProvider = providerName
+    this.#currentProvider = providerName
   }
 
   /**
    * Get current provider name
    */
   getCurrentProvider(): GetProviderNames<T> | undefined {
-    return this.currentProvider as GetProviderNames<T>
+    return this.#currentProvider as GetProviderNames<T>
   }
 
   /**
    * Get list of available providers
    */
   getAvailableProviders(): GetProviderNames<T>[] {
-    return Array.from(this.providers.keys()) as GetProviderNames<T>[]
+    return Array.from(this.#providers.keys()) as GetProviderNames<T>[]
   }
 
   /**
    * Check if a provider is healthy
    */
   async isHealthy(provider?: GetProviderNames<T>): Promise<boolean> {
-    const providerName = provider ? String(provider) : this.currentProvider
+    const providerName = provider ? String(provider) : this.#currentProvider
     if (!providerName) {
       return false
     }
 
-    const providerInstance = this.providers.get(providerName)
+    const providerInstance = this.#providers.get(providerName)
     if (!providerInstance) {
       return false
     }
@@ -178,13 +179,13 @@ export class CurrencyService<T extends CurrencyConfig<Record<string, any>> = Cur
    * Get active provider instance
    */
   private getActiveProvider(): CurrencyProviderContract {
-    if (!this.currentProvider) {
+    if (!this.#currentProvider) {
       throw new Error('No provider is currently selected')
     }
 
-    const provider = this.providers.get(this.currentProvider)
+    const provider = this.#providers.get(this.#currentProvider)
     if (!provider) {
-      throw new Error(`Provider '${this.currentProvider}' is not available`)
+      throw new Error(`Provider '${this.#currentProvider}' is not available`)
     }
 
     return provider
@@ -200,12 +201,12 @@ export class CurrencyService<T extends CurrencyConfig<Record<string, any>> = Cur
   }>> {
     const results = []
 
-    for (const [name, provider] of this.providers) {
+    for (const [name, provider] of this.#providers) {
       const healthy = await provider.isHealthy()
       results.push({
         name,
         healthy,
-        current: name === this.currentProvider
+        current: name === this.#currentProvider
       })
     }
 
@@ -257,12 +258,12 @@ export class CurrencyService<T extends CurrencyConfig<Record<string, any>> = Cur
    * Get detailed health information for a provider
    */
   async getProviderHealthInfo(provider?: GetProviderNames<T>): Promise<HealthCheckResult> {
-    const providerName = provider ? String(provider) : this.currentProvider
+    const providerName = provider ? String(provider) : this.#currentProvider
     if (!providerName) {
       return { healthy: false, error: 'No provider selected' }
     }
 
-    const providerInstance = this.providers.get(providerName)
+    const providerInstance = this.#providers.get(providerName)
     if (!providerInstance) {
       return { healthy: false, error: 'Provider not found' }
     }
@@ -280,12 +281,12 @@ export class CurrencyService<T extends CurrencyConfig<Record<string, any>> = Cur
    * Get supported currencies for current provider
    */
   async getSupportedCurrencies(provider?: GetProviderNames<T>): Promise<CurrencyCode[]> {
-    const providerName = provider ? String(provider) : this.currentProvider
+    const providerName = provider ? String(provider) : this.#currentProvider
     if (!providerName) {
       return []
     }
 
-    const providerInstance = this.providers.get(providerName)
+    const providerInstance = this.#providers.get(providerName)
     if (!providerInstance) {
       return []
     }

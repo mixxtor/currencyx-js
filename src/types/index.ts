@@ -4,6 +4,8 @@
  * Based on existing currency provider structure
  */
 
+import type { CurrencyProviderContract } from "../contracts/currency_provider"
+
 // Currency codes based on ISO 4217
 export type CurrencyCode = string
 
@@ -91,23 +93,21 @@ export interface CurrencyInfo {
 /**
  * Provider configuration interfaces
  */
-export interface GoogleFinanceConfig {
+export interface BaseConfig extends Record<string, any> {
   base?: CurrencyCode
   timeout?: number
 }
 
-export interface FixerConfig {
+export interface GoogleFinanceConfig extends BaseConfig {}
+
+export interface FixerConfig extends BaseConfig {
   accessKey: string
-  base?: CurrencyCode
-  timeout?: number
 }
-
-
 
 /**
  * Main currency configuration interface
  */
-export interface CurrencyConfig<T extends Record<string, any> = Record<string, any>> {
+export interface CurrencyConfig<T extends CurrencyProviders = CurrencyProviders> {
   /** Default provider to use for currency operations */
   default: keyof T
   /** Available currency providers configuration */
@@ -129,7 +129,7 @@ export type InferDefaultProvider<T extends CurrencyConfig> = T extends {
 /**
  * Provider registry for type augmentation
  */
-export interface CurrencyProviders {}
+export interface CurrencyProviders { [K: string]: CurrencyProviderContract }
 
 /**
  * Helper to get provider names with fallback
