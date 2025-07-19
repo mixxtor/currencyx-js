@@ -10,7 +10,9 @@ import type {
   ConversionResult,
   ExchangeRatesResult,
   HealthCheckResult,
-  CurrencyInfo
+  CurrencyInfo,
+  ConvertParams,
+  ExchangeRatesParams
 } from '../types/index.js'
 import type { CurrencyProviderContract } from '../contracts/currency_provider.js'
 
@@ -200,8 +202,8 @@ export abstract class BaseCurrencyProvider implements CurrencyProviderContract {
   /**
    * Abstract methods that must be implemented by subclasses
    */
-  abstract latestRates(symbols?: CurrencyCode[]): Promise<ExchangeRatesResult>
-  abstract convert(amount: number, from: CurrencyCode, to: CurrencyCode): Promise<ConversionResult>
+  abstract latestRates(params?: ExchangeRatesParams): Promise<ExchangeRatesResult>
+  abstract convert(params: ConvertParams): Promise<ConversionResult>
   abstract getConvertRate(from: CurrencyCode, to: CurrencyCode, currencyList?: Record<string, any>[]): Promise<number | undefined>
 
   /**
@@ -226,7 +228,7 @@ export abstract class BaseCurrencyProvider implements CurrencyProviderContract {
    */
   async isHealthy(): Promise<boolean> {
     try {
-      const result = await this.convert(1, 'USD', 'EUR')
+      const result = await this.convert({ amount: 1, from: 'USD', to: 'EUR' })
       return result.success && !!result.result
     } catch {
       return false
@@ -239,7 +241,7 @@ export abstract class BaseCurrencyProvider implements CurrencyProviderContract {
   async getHealthInfo(): Promise<HealthCheckResult> {
     const startTime = Date.now()
     try {
-      const result = await this.convert(1, 'USD', 'EUR')
+      const result = await this.convert({ amount: 1, from: 'USD', to: 'EUR' })
       const latency = Math.max(Date.now() - startTime, 1) // Ensure minimum 1ms latency
 
       return {

@@ -33,9 +33,13 @@ const config = defineConfig({
 
 const currency = createCurrency(config)
 
-// Convert currency
-const result = await currency.convert(100, 'USD', 'EUR')
+// Convert currency (new object-based API)
+const result = await currency.convert({ amount: 100, from: 'USD', to: 'EUR' })
 console.log(result.result) // 85.23
+
+// Or use backward-compatible method
+const result2 = await currency.convertAmount(100, 'USD', 'EUR')
+console.log(result2.result) // 85.23
 
 // Type-safe provider switching
 currency.use('google')    // ✅ Valid
@@ -124,33 +128,62 @@ currency.use('google')   // ✅
 currency.use('fixer')    // ✅
 // currency.use('invalid') // ❌ TypeScript error
 
-const result = await currency.convert(100, 'USD', 'EUR')
+const result = await currency.convert({ amount: 100, from: 'USD', to: 'EUR' })
 ```
+
+## 🔄 API Design
+
+### Selective Object-based Parameters
+
+CurrencyX.js uses object-based parameters for **core conversion methods** where it provides the most benefit:
+
+```typescript
+// ✅ Core methods use object parameters for clarity
+await currency.convert({
+  amount: 100,
+  from: 'USD',
+  to: 'EUR'
+})
+
+await currency.getExchangeRates({
+  base: 'USD',
+  symbols: ['EUR', 'GBP']
+})
+
+// ✅ Backward compatibility methods available
+await currency.convertAmount(100, 'USD', 'EUR')
+await currency.getRates('USD', ['EUR', 'GBP'])
+
+// ✅ Simple methods keep positional parameters
+currency.use('google')
+currency.round(123.456, 2)
+currency.formatCurrency(100, 'USD', 'en-US')
+```
+
+**Why selective approach:**
+- **Core methods benefit most**: `convert()` and `getExchangeRates()` have multiple parameters
+- **Simple methods stay simple**: Single-parameter methods don't need object wrapping
+- **Consistent with ecosystem**: Follows patterns like `fetch()` API design
+- **Easy migration**: Minimal breaking changes
 
 ## 📚 API Reference
 
 ### Core Methods
 
 ```typescript
-// Convert currency
-await currency.convert(amount, from, to)
+// Core methods with object parameters
+await currency.convert({ amount, from, to })
+await currency.getExchangeRates({ base?, symbols? })
 
-// Get exchange rates
-await currency.getExchangeRates(base?, symbols?)
+// Backward compatibility for core methods
+await currency.convertAmount(amount, from, to)
+await currency.getRates(base?, symbols?)
 
-// Switch provider (type-safe)
+// Simple methods keep positional parameters
 currency.use(provider)
-
-// Get current provider
 currency.getCurrentProvider()
-
-// Get available providers
 currency.getAvailableProviders()
-
-// Check provider health
 await currency.isHealthy(provider?)
-
-// Round currency value
 currency.round(value, precision?)
 ```
 
@@ -160,7 +193,7 @@ currency.round(value, precision?)
 // Format currency
 currency.formatCurrency(amount, currencyCode, locale?)
 
-// Convert and format in one step
+// Convert and format in one step (uses new API internally)
 await currency.convertAndFormat(amount, from, to, locale?)
 
 // Get all providers health status

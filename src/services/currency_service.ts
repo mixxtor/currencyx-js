@@ -10,7 +10,9 @@ import type {
   ConversionResult,
   ExchangeRatesResult,
   HealthCheckResult,
-  CurrencyCode
+  CurrencyCode,
+  ConvertParams,
+  ExchangeRatesParams
 } from '../types/index.js'
 import type { CurrencyProviderContract } from '../contracts/currency_provider.js'
 import { GoogleFinanceProvider } from '../providers/google_finance.js'
@@ -20,8 +22,20 @@ import { FixerProvider } from '../providers/fixer.js'
  * Abstract Currency Service Interface
  */
 export abstract class CurrencyServiceAbstract<T extends CurrencyConfig<Record<string, any>> = CurrencyConfig<Record<string, any>>> {
-  abstract convert(amount: number, from: CurrencyCode, to: CurrencyCode): Promise<ConversionResult>
-  abstract getExchangeRates(base?: CurrencyCode, symbols?: CurrencyCode[]): Promise<ExchangeRatesResult>
+  // Core methods with object parameters for clarity
+  abstract convert(params: ConvertParams): Promise<ConversionResult>
+  abstract getExchangeRates(params?: ExchangeRatesParams): Promise<ExchangeRatesResult>
+
+  // Convenience methods for backward compatibility (only for core methods)
+  async convertAmount(amount: number, from: CurrencyCode, to: CurrencyCode): Promise<ConversionResult> {
+    return this.convert({ amount, from, to })
+  }
+
+  async getRates(base?: CurrencyCode, symbols?: CurrencyCode[]): Promise<ExchangeRatesResult> {
+    return this.getExchangeRates({ base, symbols })
+  }
+
+  // Other methods keep simple positional parameters
   abstract use(provider: GetProviderNames<T>): void
   abstract getCurrentProvider(): GetProviderNames<T> | undefined
   abstract getAvailableProviders(): GetProviderNames<T>[]
@@ -46,13 +60,14 @@ export abstract class CurrencyServiceAbstract<T extends CurrencyConfig<Record<st
  * Main Currency Service Implementation
  */
 export class CurrencyService<T extends CurrencyConfig<Record<string, any>> = CurrencyConfig<Record<string, any>>>
-  implements CurrencyServiceAbstract<T> {
+  extends CurrencyServiceAbstract<T> {
 
   private providers: Map<string, CurrencyProviderContract> = new Map()
   private currentProvider?: string
   private config: T
 
   constructor(config: T) {
+    super()
     this.config = config
     this.initializeProviders()
     this.currentProvider = String(config.default)
@@ -90,23 +105,23 @@ export class CurrencyService<T extends CurrencyConfig<Record<string, any>> = Cur
   /**
    * Convert currency amount
    */
-  async convert(amount: number, from: CurrencyCode, to: CurrencyCode): Promise<ConversionResult> {
+  async convert(params: ConvertParams): Promise<ConversionResult> {
     const provider = this.getActiveProvider()
-    return await provider.convert(amount, from, to)
+    return await provider.convert(params)
   }
 
   /**
    * Get exchange rates
    */
-  async getExchangeRates(base?: CurrencyCode, symbols?: CurrencyCode[]): Promise<ExchangeRatesResult> {
+  async getExchangeRates(params?: ExchangeRatesParams): Promise<ExchangeRatesResult> {
     const provider = this.getActiveProvider()
 
     // Set base currency if provided
-    if (base) {
-      provider.setBase(base)
+    if (params?.base) {
+      provider.setBase(params.base)
     }
 
-    return await provider.latestRates(symbols)
+    return await provider.latestRates(params)
   }
 
   /**
@@ -225,7 +240,7 @@ export class CurrencyService<T extends CurrencyConfig<Record<string, any>> = Cur
     converted: string
     rate: number
   }> {
-    const result = await this.convert(amount, from, to)
+    const result = await this.convert({ amount, from, to })
 
     if (!result.success || result.result === undefined) {
       throw new Error(result.error?.info || 'Conversion failed')

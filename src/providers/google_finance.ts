@@ -4,7 +4,7 @@
  * Based on existing GoogleFinance from providers/currency/services/google_finance.ts
  */
 
-import type { CurrencyCode, ConversionResult, ExchangeRatesResult, GoogleFinanceConfig } from '../types/index.js'
+import type { CurrencyCode, ConversionResult, ExchangeRatesResult, GoogleFinanceConfig, ExchangeRatesParams, ConvertParams } from '../types/index.js'
 import { BaseCurrencyProvider } from './base_provider.js'
 
 export class GoogleFinanceProvider extends BaseCurrencyProvider {
@@ -22,9 +22,9 @@ export class GoogleFinanceProvider extends BaseCurrencyProvider {
   /**
    * Get latest exchange rates
    */
-  async latestRates(symbols?: CurrencyCode[]): Promise<ExchangeRatesResult> {
+  async latestRates(params?: ExchangeRatesParams): Promise<ExchangeRatesResult> {
     const rates: Record<string, number> = {}
-    const currenciesToFetch = symbols || this.currencies
+    const currenciesToFetch = params?.symbols || this.currencies
 
     try {
       for (const code of currenciesToFetch) {
@@ -51,7 +51,8 @@ export class GoogleFinanceProvider extends BaseCurrencyProvider {
   /**
    * Convert currency amount
    */
-  async convert(amount: number, from: CurrencyCode, to: CurrencyCode): Promise<ConversionResult> {
+  async convert(params: ConvertParams): Promise<ConversionResult> {
+    const { amount, from, to } = params
     try {
       if (from === to) {
         return this.createConversionResult(amount, from, to, amount, 1.0)

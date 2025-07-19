@@ -4,7 +4,7 @@
  * Based on existing Fixer from providers/currency/services/fixer.ts
  */
 
-import type { CurrencyCode, ConversionResult, ExchangeRatesResult, FixerConfig } from '../types/index.js'
+import type { CurrencyCode, ConversionResult, ExchangeRatesResult, FixerConfig, ExchangeRatesParams, ConvertParams } from '../types/index.js'
 import { BaseCurrencyProvider } from './base_provider.js'
 
 interface FixerResponse {
@@ -65,7 +65,8 @@ export class FixerProvider extends BaseCurrencyProvider {
   /**
    * Get latest exchange rates
    */
-  async latestRates(symbols?: CurrencyCode[]): Promise<ExchangeRatesResult> {
+  async latestRates(params?: ExchangeRatesParams): Promise<ExchangeRatesResult> {
+    const symbols = params?.symbols
     try {
       const url = new URL(`${this.baseUrl}/latest`)
       url.searchParams.set('access_key', this.accessKey)
@@ -108,7 +109,8 @@ export class FixerProvider extends BaseCurrencyProvider {
   /**
    * Convert currency amount
    */
-  async convert(amount: number, from: CurrencyCode, to: CurrencyCode): Promise<ConversionResult> {
+  async convert(params: ConvertParams): Promise<ConversionResult> {
+    const { amount, from, to } = params
     try {
       if (from === to) {
         return this.createConversionResult(amount, from, to, amount, 1.0)
@@ -164,18 +166,18 @@ export class FixerProvider extends BaseCurrencyProvider {
 
       // If one of the currencies is the base currency, we can use latest rates
       if (from === this.base) {
-        const rates = await this.latestRates([to])
+        const rates = await this.latestRates({ symbols: [to] })
         return rates.rates[to]
       }
 
       if (to === this.base) {
-        const rates = await this.latestRates([from])
+        const rates = await this.latestRates({ symbols: [from] })
         const rate = rates.rates[from]
         return rate ? 1 / rate : undefined
       }
 
       // For cross-currency conversion, get both rates against base
-      const rates = await this.latestRates([from, to])
+      const rates = await this.latestRates({ symbols: [from, to] })
       const fromRate = rates.rates[from]
       const toRate = rates.rates[to]
 

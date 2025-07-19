@@ -76,7 +76,7 @@ describe('FixerProvider', () => {
   })
 
   it('should handle same currency conversion', async () => {
-    const result = await provider.convert(100, 'EUR', 'EUR')
+    const result = await provider.convert({ amount: 100, from: 'EUR', to: 'EUR' })
     expect(result.success).toBe(true)
     expect(result.result).toBe(100)
     expect(result.info.rate).toBe(1.0)
@@ -85,7 +85,7 @@ describe('FixerProvider', () => {
   // Note: Real API tests would require valid API key and network access
   it('should handle API errors gracefully', async () => {
     // With invalid API key, should return error result
-    const result = await provider.convert(100, 'EUR', 'USD')
+    const result = await provider.convert({ amount: 100, from: 'EUR', to: 'USD' })
     expect(result).toHaveProperty('success')
     expect(result).toHaveProperty('query')
   })

@@ -4,11 +4,13 @@
  * Based on existing CurrencyProviderContract from providers/currency/types.ts
  */
 
-import type { 
-  CurrencyCode, 
-  ConversionResult, 
-  ExchangeRatesResult, 
-  HealthCheckResult 
+import type {
+  CurrencyCode,
+  ConversionResult,
+  ExchangeRatesResult,
+  HealthCheckResult,
+  ConvertParams,
+  ExchangeRatesParams
 } from '../types/index.js'
 
 /**
@@ -38,12 +40,12 @@ export interface CurrencyProviderContract {
   /**
    * Get latest exchange rates
    */
-  latestRates(symbols?: CurrencyCode[]): Promise<ExchangeRatesResult>
+  latestRates(params?: ExchangeRatesParams): Promise<ExchangeRatesResult>
 
   /**
    * Convert currency amount
    */
-  convert(amount: number, from: CurrencyCode, to: CurrencyCode): Promise<ConversionResult>
+  convert(params: ConvertParams): Promise<ConversionResult>
 
   /**
    * Get conversion rate between two currencies

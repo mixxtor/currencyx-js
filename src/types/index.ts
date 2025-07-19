@@ -1,11 +1,28 @@
 /**
  * Core Types for CurrencyX.js
- * 
+ *
  * Based on existing currency provider structure
  */
 
 // Currency codes based on ISO 4217
 export type CurrencyCode = string
+
+/**
+ * Parameters for currency conversion
+ */
+export interface ConvertParams {
+  amount: number
+  from: CurrencyCode
+  to: CurrencyCode
+}
+
+/**
+ * Parameters for getting exchange rates
+ */
+export interface ExchangeRatesParams {
+  base?: CurrencyCode
+  symbols?: CurrencyCode[]
+}
 
 /**
  * Base result interface for all operations
