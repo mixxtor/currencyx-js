@@ -37,7 +37,7 @@ export abstract class CurrencyServiceAbstract<T extends CurrencyConfig<CurrencyP
   }
 
   // Other methods keep simple positional parameters
-  abstract use(provider: GetProviderNames<T>): this
+  abstract use<K extends keyof CurrencyProviders>(provider: K): CurrencyProviders[K]
   abstract getCurrentProvider(): GetProviderNames<T> | undefined
   abstract getAvailableProviders(): GetProviderNames<T>[]
   abstract isHealthy(provider?: GetProviderNames<T>): Promise<boolean>
@@ -128,13 +128,13 @@ export class CurrencyService<T extends CurrencyConfig<CurrencyProviders> = Curre
   /**
    * Switch to a different provider (type-safe)
    */
-  use(provider: GetProviderNames<T>): this {
+  use<K extends keyof CurrencyProviders>(provider: K): CurrencyProviders[K] {
     const providerName = String(provider)
     if (!this.#providers.has(providerName)) {
       throw new Error(`Provider '${providerName}' is not configured`)
     }
     this.#currentProvider = providerName
-    return this
+    return this.#providers.get(providerName) as CurrencyProviders[K]
   }
 
   /**
