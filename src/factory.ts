@@ -5,7 +5,7 @@
  */
 
 import type { CurrencyConfig, CurrencyProviders } from './types/index.js'
-import { CurrencyService, CurrencyServiceAbstract } from './services/index.js'
+import { CurrencyService } from './services/index.js'
 
 /**
  * Create a typed currency service with provider inference
@@ -30,6 +30,6 @@ import { CurrencyService, CurrencyServiceAbstract } from './services/index.js'
  */
 export function createCurrency<T extends CurrencyConfig<CurrencyProviders> = CurrencyConfig<CurrencyProviders>>(
   config: T
-): CurrencyServiceAbstract<T> {
+): CurrencyService<T> {
   return new CurrencyService<T>(config)
 }
