@@ -55,7 +55,7 @@ export class CurrencyService<T extends CurrencyConfig<Record<string, any>> = Cur
   constructor(config: T) {
     this.config = config
     this.initializeProviders()
-    this.currentProvider = String(config.defaultProvider)
+    this.currentProvider = String(config.default)
   }
 
   /**

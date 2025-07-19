@@ -91,7 +91,9 @@ export interface FixerConfig {
  * Main currency configuration interface
  */
 export interface CurrencyConfig<T extends Record<string, any> = Record<string, any>> {
-  defaultProvider: keyof T
+  /** Default provider to use for currency operations */
+  default: keyof T
+  /** Available currency providers configuration */
   providers: T
 }
 
@@ -104,7 +106,7 @@ export type InferProviders<T> = T extends CurrencyConfig<infer P> ? keyof P : ne
  * Infer default provider from configuration
  */
 export type InferDefaultProvider<T extends CurrencyConfig> = T extends {
-  defaultProvider: infer D
+  default: infer D
 } ? D : never
 
 /**

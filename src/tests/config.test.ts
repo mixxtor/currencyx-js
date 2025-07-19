@@ -8,7 +8,7 @@ import { defineConfig, exchanges, google, fixer } from '../config/index.js'
 describe('defineConfig', () => {
   it('should define configuration with type inference', () => {
     const config = defineConfig({
-      defaultProvider: 'google' as const,
+      default: 'google' as const,
       providers: {
         google: { base: 'USD' },
         fixer: { accessKey: 'test-key' }
@@ -16,7 +16,7 @@ describe('defineConfig', () => {
     })
 
     expect(config).toEqual({
-      defaultProvider: 'google',
+      default: 'google',
       providers: {
         google: { base: 'USD' },
         fixer: { accessKey: 'test-key' }
@@ -26,7 +26,7 @@ describe('defineConfig', () => {
 
   it('should preserve exact configuration structure', () => {
     const originalConfig = {
-      defaultProvider: 'database' as const,
+      default: 'database' as const,
       providers: {
         database: {
           model: () => ({}),
@@ -36,7 +36,7 @@ describe('defineConfig', () => {
     }
 
     const config = defineConfig(originalConfig)
-    expect(config).toBe(originalConfig) // Should return the same object
+    expect(config).toBe(originalConfig)
   })
 })
 
@@ -134,7 +134,7 @@ describe('Provider Configuration Helpers', () => {
 
     it('should work with defineConfig', () => {
       const config = defineConfig({
-        defaultProvider: 'google' as const,
+        default: 'google' as const,
         providers: {
           google: exchanges.google({ base: 'USD' }),
           fixer: exchanges.fixer({ accessKey: 'test-key' })
@@ -159,29 +159,21 @@ describe('Type Safety', () => {
   it('should infer provider types correctly', () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const config = defineConfig({
-      defaultProvider: 'google' as const,
+      default: 'google' as const,
       providers: {
         google: exchanges.google(),
         fixer: exchanges.fixer({ accessKey: 'test-key' })
       }
     })
 
-    // TypeScript should infer that these are the only valid providers
     type ProviderNames = keyof typeof config.providers
     const validProviders: ProviderNames[] = ['google', 'fixer']
-
     expect(validProviders).toEqual(['google', 'fixer'])
   })
 
   it('should enforce required configuration properties', () => {
-    // These should cause TypeScript errors if uncommented:
-
-    // Missing accessKey for fixer
-    // const invalidFixerConfig = exchanges.fixer({})
-
-    // This should work
     const validConfig = defineConfig({
-      defaultProvider: 'google' as const,
+      default: 'google' as const,
       providers: {
         google: exchanges.google()
       }

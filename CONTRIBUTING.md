@@ -103,7 +103,7 @@ git push origin feature/your-feature-name
 ```typescript
 // ✅ Good
 interface CurrencyConfig {
-  defaultProvider: string
+  default: string
   providers: Record<string, any>
 }
 

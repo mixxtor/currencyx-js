@@ -13,7 +13,7 @@ import type { GoogleFinanceConfig, FixerConfig } from '../types/index.js'
  * @example
  * ```typescript
  * const config = defineConfig({
- *   defaultProvider: 'google',
+ *   default: 'google',
  *   providers: {
  *     google: exchanges.google({ base: 'USD', timeout: 5000 })
  *   }
@@ -34,7 +34,7 @@ export function google(config: GoogleFinanceConfig = {}): GoogleFinanceConfig {
  * @example
  * ```typescript
  * const config = defineConfig({
- *   defaultProvider: 'fixer',
+ *   default: 'fixer',
  *   providers: {
  *     fixer: exchanges.fixer({ 
  *       accessKey: env.get('FIXER_API_KEY'),

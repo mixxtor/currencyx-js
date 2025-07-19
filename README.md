@@ -1,6 +1,6 @@
 # CurrencyX.js
 
-Modern TypeScript currency converter with **type inference** and multiple providers. Completely rewritten based on `provider/currency/` architecture.
+Modern TypeScript currency converter with **type inference** and multiple providers.
 
 ## ✨ Features
 
@@ -24,7 +24,7 @@ import { createCurrency, defineConfig, exchanges } from '@mixxtor/currencyx-js'
 
 // Define configuration with type inference and provider helpers
 const config = defineConfig({
-  defaultProvider: 'google' as const,
+  default: 'google' as const,
   providers: {
     google: exchanges.google({ base: 'USD' }),
     fixer: exchanges.fixer({ accessKey: 'your-api-key' })
@@ -45,11 +45,9 @@ currency.use('fixer')     // ✅ Valid
 
 ## 🧠 Type Inference
 
-Get **compile-time safety** with automatic provider validation:
-
 ```typescript
 const config = defineConfig({
-  defaultProvider: 'google' as const,
+  default: 'google' as const,
   providers: {
     google: exchanges.google({ base: 'USD' }),
     fixer: exchanges.fixer({ accessKey: process.env.FIXER_API_KEY! })
@@ -98,7 +96,7 @@ providers: {
 import { defineConfig, exchanges } from '@mixxtor/currencyx-js'
 
 const currencyConfig = defineConfig({
-  defaultProvider: 'google' as const,
+  default: 'google' as const,
   providers: {
     google: exchanges.google({ base: 'USD' }),
     fixer: exchanges.fixer({ accessKey: process.env.get('FIXER_API_KEY') })
@@ -221,7 +219,7 @@ class MyCustomProvider extends BaseCurrencyProvider {
 
 // Usage
 const config = defineConfig({
-  defaultProvider: 'mycustom' as const,
+  default: 'mycustom' as const,
   providers: {
     mycustom: new MyCustomProvider({ apiKey: 'your-key' })
   }

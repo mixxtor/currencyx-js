@@ -13,7 +13,7 @@ import { CurrencyService, CurrencyServiceAbstract } from './services/index.js'
  * @example
  * ```typescript
  * const config = defineConfig({
- *   defaultProvider: 'google' as const,
+ *   default: 'google' as const,
  *   providers: {
  *     google: { base: 'USD' },
  *     fixer: { accessKey: 'your-key' }
