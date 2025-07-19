@@ -8,6 +8,8 @@
 // Types
 export type {
   CurrencyCode,
+  ConvertParams,
+  ExchangeRatesParams,
   ConversionResult,
   ExchangeRatesResult,
   HealthCheckResult,
