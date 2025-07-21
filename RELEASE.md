@@ -15,18 +15,21 @@ The package uses **release-it** with **conventional commits** for automated rele
 ### 🔄 Release Triggers
 
 #### **1. Automatic Release (Push to main/master)**
+
 ```bash
 # Any push to main/master triggers automatic patch release
 git push origin main
 ```
 
 #### **2. Manual Release (GitHub Actions)**
+
 ```bash
 # Go to GitHub Actions → Release workflow → Run workflow
 # Choose release type: patch, minor, major
 ```
 
 #### **3. Local Release (Development)**
+
 ```bash
 # Patch release (2.0.0 → 2.0.1)
 npm run release:patch
@@ -50,6 +53,7 @@ npm run release:dry
 Use conventional commit format for automatic changelog generation:
 
 ### **Commit Types:**
+
 ```bash
 feat: add new currency provider        # ✨ Features
 fix: resolve conversion rate bug       # 🐛 Bug Fixes
@@ -63,6 +67,7 @@ chore: update dependencies            # 🔧 Maintenance
 ```
 
 ### **Examples:**
+
 ```bash
 git commit -m "feat: add support for custom database columns"
 git commit -m "fix: handle undefined exchange rates gracefully"
@@ -73,6 +78,7 @@ git commit -m "perf: optimize provider initialization"
 ## 🔧 Release Configuration
 
 ### **Release-it Configuration (`.release-it.json`):**
+
 ```json
 {
   "git": {
@@ -99,12 +105,14 @@ git commit -m "perf: optimize provider initialization"
 ### **GitHub Actions Workflows:**
 
 #### **1. CI Workflow (`.github/workflows/ci.yml`):**
+
 - Runs on every push/PR
 - Tests on Node.js 18, 20, 22
 - Linting, type checking, building
 - Package functionality testing
 
 #### **2. Release Workflow (`.github/workflows/release.yml`):**
+
 - Runs on push to main/master
 - Manual trigger with release type selection
 - Automated testing, building, and publishing
@@ -113,6 +121,7 @@ git commit -m "perf: optimize provider initialization"
 ## 📦 Release Process Steps
 
 ### **Automated Steps:**
+
 1. **Pre-checks**: Linting, type checking
 2. **Version Bump**: Based on conventional commits
 3. **Build**: Generate dist files
@@ -123,6 +132,7 @@ git commit -m "perf: optimize provider initialization"
 8. **GitHub Release**: Create release with notes
 
 ### **Manual Verification:**
+
 ```bash
 # Check package before release
 npm run build
@@ -140,18 +150,21 @@ npm run release:dry
 ## 🎯 Release Types
 
 ### **Patch Release (2.0.0 → 2.0.1):**
+
 - Bug fixes
 - Documentation updates
 - Minor improvements
 - **Trigger**: `fix:`, `docs:`, `chore:` commits
 
 ### **Minor Release (2.0.0 → 2.1.0):**
+
 - New features
 - New providers
 - API enhancements
 - **Trigger**: `feat:` commits
 
 ### **Major Release (2.0.0 → 3.0.0):**
+
 - Breaking changes
 - API redesign
 - Architecture changes
@@ -160,14 +173,17 @@ npm run release:dry
 ## 🔍 Monitoring Releases
 
 ### **NPM Package:**
+
 - https://www.npmjs.com/package/@mixxtor/currencyx-js
 - Check download stats and versions
 
 ### **GitHub Releases:**
+
 - https://github.com/mixxtor/currencyx-js/releases
 - View release notes and assets
 
 ### **CI/CD Status:**
+
 - GitHub Actions tab for build status
 - Release workflow logs
 
@@ -176,12 +192,14 @@ npm run release:dry
 ### **Common Issues:**
 
 #### **1. NPM Token Expired:**
+
 ```bash
 # Update NPM_TOKEN in GitHub secrets
 # Re-run failed workflow
 ```
 
 #### **2. Build Failures:**
+
 ```bash
 # Check CI logs
 # Fix linting/type errors
@@ -189,6 +207,7 @@ npm run release:dry
 ```
 
 #### **3. Version Conflicts:**
+
 ```bash
 # Ensure package.json version is correct
 # Check for existing tags
@@ -196,6 +215,7 @@ npm run release:dry
 ```
 
 ### **Emergency Release:**
+
 ```bash
 # Skip CI checks (use carefully)
 npm run release -- --ci=false
@@ -207,6 +227,7 @@ npm run release -- --increment=2.1.0
 ## 📈 Release Metrics
 
 Track these metrics for each release:
+
 - **Build Time**: CI/CD pipeline duration
 - **Test Coverage**: Ensure tests pass
 - **Download Stats**: NPM package adoption
@@ -216,6 +237,7 @@ Track these metrics for each release:
 ## 🎉 Post-Release
 
 After successful release:
+
 1. **Verify NPM**: Check package is available
 2. **Test Installation**: `npm install @mixxtor/currencyx-js`
 3. **Update Documentation**: If needed

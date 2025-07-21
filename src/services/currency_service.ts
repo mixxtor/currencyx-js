@@ -1,6 +1,6 @@
 /**
  * Currency Service
- * 
+ *
  * Main service class with type-safe provider switching
  */
 
@@ -13,11 +13,9 @@ import type {
   CurrencyCode,
   ConvertParams,
   ExchangeRatesParams,
-  CurrencyProviders
+  CurrencyProviders,
 } from '../types/index.js'
 import type { CurrencyProviderContract } from '../contracts/currency_provider.js'
-import { GoogleFinanceProvider } from '../providers/google_finance.js'
-import { FixerProvider } from '../providers/fixer.js'
 
 /**
  * Abstract Currency Service Interface
@@ -43,16 +41,23 @@ export abstract class CurrencyServiceAbstract<T extends CurrencyConfig<CurrencyP
   abstract isHealthy(provider?: GetProviderNames<T>): Promise<boolean>
   abstract round(value: number, precision?: number): number
   abstract formatCurrency(amount: number, currencyCode: CurrencyCode, locale?: string): string
-  abstract convertAndFormat(amount: number, from: CurrencyCode, to: CurrencyCode, locale?: string): Promise<{
+  abstract convertAndFormat(
+    amount: number,
+    from: CurrencyCode,
+    to: CurrencyCode,
+    locale?: string
+  ): Promise<{
     original: string
     converted: string
     rate: number
   }>
-  abstract getProvidersHealth(): Promise<Array<{
-    name: string
-    healthy: boolean
-    current: boolean
-  }>>
+  abstract getProvidersHealth(): Promise<
+    Array<{
+      name: string
+      healthy: boolean
+      current: boolean
+    }>
+  >
   abstract getProviderHealthInfo(provider?: GetProviderNames<T>): Promise<HealthCheckResult>
   abstract getSupportedCurrencies(provider?: GetProviderNames<T>): Promise<CurrencyCode[]>
 }
@@ -60,9 +65,9 @@ export abstract class CurrencyServiceAbstract<T extends CurrencyConfig<CurrencyP
 /**
  * Main Currency Service Implementation
  */
-export class CurrencyService<T extends CurrencyConfig<CurrencyProviders> = CurrencyConfig<CurrencyProviders>>
-  extends CurrencyServiceAbstract<T> {
-
+export class CurrencyService<
+  T extends CurrencyConfig<CurrencyProviders> = CurrencyConfig<CurrencyProviders>,
+> extends CurrencyServiceAbstract<T> {
   #providers: Map<string, CurrencyProviderContract> = new Map()
   #currentProvider?: string
   #config: T
@@ -80,25 +85,7 @@ export class CurrencyService<T extends CurrencyConfig<CurrencyProviders> = Curre
   #initializeProviders(): void {
     const providers = this.#config.providers
 
-    for (const [name, config] of Object.entries(providers)) {
-      let provider: CurrencyProviderContract
-
-      switch (name) {
-        case 'google':
-          provider = new GoogleFinanceProvider(config)
-          break
-        case 'fixer':
-          provider = new FixerProvider(config as any)
-          break
-        default:
-          // For custom providers, assume they are already instantiated
-          if (config && typeof config === 'object' && 'name' in config) {
-            provider = config as CurrencyProviderContract
-          } else {
-            throw new Error(`Unknown provider: ${name}`)
-          }
-      }
-
+    for (const [name, provider] of Object.entries(providers)) {
       this.#providers.set(name, provider)
     }
   }
@@ -195,11 +182,13 @@ export class CurrencyService<T extends CurrencyConfig<CurrencyProviders> = Curre
   /**
    * Get all configured providers with their health status
    */
-  async getProvidersHealth(): Promise<Array<{
-    name: string
-    healthy: boolean
-    current: boolean
-  }>> {
+  async getProvidersHealth(): Promise<
+    Array<{
+      name: string
+      healthy: boolean
+      current: boolean
+    }>
+  > {
     const results = []
 
     for (const [name, provider] of this.#providers) {
@@ -207,7 +196,7 @@ export class CurrencyService<T extends CurrencyConfig<CurrencyProviders> = Curre
       results.push({
         name,
         healthy,
-        current: name === this.#currentProvider
+        current: name === this.#currentProvider,
       })
     }
 
@@ -221,7 +210,7 @@ export class CurrencyService<T extends CurrencyConfig<CurrencyProviders> = Curre
     try {
       return new Intl.NumberFormat(locale, {
         style: 'currency',
-        currency: currencyCode
+        currency: currencyCode,
       }).format(amount)
     } catch {
       // Fallback formatting
@@ -251,7 +240,7 @@ export class CurrencyService<T extends CurrencyConfig<CurrencyProviders> = Curre
     return {
       original: this.formatCurrency(amount, from, locale),
       converted: this.formatCurrency(result.result, to, locale),
-      rate: result.info.rate || 0
+      rate: result.info.rate || 0,
     }
   }
 

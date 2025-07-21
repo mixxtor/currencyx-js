@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 
 
+## [1.0.8](https://github.com/mixxtor/currencyx-js/compare/v1.0.7...v1.0.8) (2025-07-21)
+
 ## [1.0.7](https://github.com/mixxtor/currencyx-js/compare/v1.0.6...v1.0.7) (2025-07-19)
 
 ## [1.0.6](https://github.com/mixxtor/currencyx-js/compare/v1.0.5...v1.0.6) (2025-07-19)
@@ -22,4 +24,4 @@ All notable changes to this project will be documented in this file.
 
 ### ♻️ Code Refactoring
 
-* rename defaultProvider to default in configuration ([436ce82](https://github.com/mixxtor/currencyx-js/commit/436ce82a3c7db69f2a2ef2cc761468e69e519d8b))
+- rename defaultProvider to default in configuration ([436ce82](https://github.com/mixxtor/currencyx-js/commit/436ce82a3c7db69f2a2ef2cc761468e69e519d8b))

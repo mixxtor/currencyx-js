@@ -1,6 +1,6 @@
 /**
  * Currency Provider Contract
- * 
+ *
  * Based on existing CurrencyProviderContract from providers/currency/types.ts
  */
 
@@ -10,7 +10,7 @@ import type {
   ExchangeRatesResult,
   HealthCheckResult,
   ConvertParams,
-  ExchangeRatesParams
+  ExchangeRatesParams,
 } from '../types/index.js'
 
 /**

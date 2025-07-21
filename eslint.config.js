@@ -7,10 +7,10 @@ export default [
     languageOptions: {
       parser: typescriptParser,
       ecmaVersion: 2022,
-      sourceType: 'module'
+      sourceType: 'module',
     },
     plugins: {
-      '@typescript-eslint': typescriptPlugin
+      '@typescript-eslint': typescriptPlugin,
     },
     rules: {
       'prefer-const': 'error',
@@ -18,29 +18,23 @@ export default [
       'no-unused-vars': 'off',
       'no-undef': 'off',
       '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
-      '@typescript-eslint/no-explicit-any': 'warn'
-    }
+      '@typescript-eslint/no-explicit-any': 'warn',
+    },
   },
   {
     files: ['**/*.js', '**/*.mjs'],
     languageOptions: {
       ecmaVersion: 2022,
-      sourceType: 'module'
+      sourceType: 'module',
     },
     rules: {
       'prefer-const': 'error',
       'no-var': 'error',
       'semi': ['error', 'never'],
-      'quotes': ['error', 'single']
-    }
+      'quotes': ['error', 'single'],
+    },
   },
   {
-    ignores: [
-      'dist/**',
-      'node_modules/**',
-      '*.config.js',
-      '*.config.ts',
-      'test-*.ts'
-    ]
-  }
+    ignores: ['dist/**', 'node_modules/**', '*.config.js', '*.config.ts', 'test-*.ts'],
+  },
 ]

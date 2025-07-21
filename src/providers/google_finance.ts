@@ -1,10 +1,17 @@
 /**
  * Google Finance Provider
- * 
+ *
  * Based on existing GoogleFinance from providers/currency/services/google_finance.ts
  */
 
-import type { CurrencyCode, ConversionResult, ExchangeRatesResult, GoogleFinanceConfig, ExchangeRatesParams, ConvertParams } from '../types/index.js'
+import type {
+  CurrencyCode,
+  ConversionResult,
+  ExchangeRatesResult,
+  GoogleFinanceConfig,
+  ExchangeRatesParams,
+  ConvertParams,
+} from '../types/index.js'
 import { BaseCurrencyProvider } from './base_provider.js'
 
 export class GoogleFinanceProvider extends BaseCurrencyProvider {
@@ -41,10 +48,14 @@ export class GoogleFinanceProvider extends BaseCurrencyProvider {
 
       return this.createExchangeRatesResult(this.base, rates)
     } catch (error) {
-      return this.createExchangeRatesResult(this.base, {}, {
-        info: error instanceof Error ? error.message : 'Failed to fetch exchange rates',
-        type: 'FETCH_ERROR'
-      })
+      return this.createExchangeRatesResult(
+        this.base,
+        {},
+        {
+          info: error instanceof Error ? error.message : 'Failed to fetch exchange rates',
+          type: 'FETCH_ERROR',
+        }
+      )
     }
   }
 
@@ -62,7 +73,7 @@ export class GoogleFinanceProvider extends BaseCurrencyProvider {
       if (!rate) {
         return this.createConversionResult(amount, from, to, undefined, undefined, {
           info: `Failed to get exchange rate for ${from}-${to}`,
-          type: 'RATE_NOT_FOUND'
+          type: 'RATE_NOT_FOUND',
         })
       }
 
@@ -71,7 +82,7 @@ export class GoogleFinanceProvider extends BaseCurrencyProvider {
     } catch (error) {
       return this.createConversionResult(amount, from, to, undefined, undefined, {
         info: error instanceof Error ? error.message : 'Conversion failed',
-        type: 'CONVERSION_ERROR'
+        type: 'CONVERSION_ERROR',
       })
     }
   }
@@ -89,11 +100,12 @@ export class GoogleFinanceProvider extends BaseCurrencyProvider {
   private async getRate(from: CurrencyCode, to: CurrencyCode): Promise<number | undefined> {
     try {
       const url = `${this.baseUrl}/quote/${from}-${to}`
-      const userAgent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'
+      const userAgent =
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'
 
       const response = await fetch(url, {
         headers: { 'User-Agent': userAgent },
-        signal: AbortSignal.timeout(this.timeout)
+        signal: AbortSignal.timeout(this.timeout),
       })
 
       if (!response.ok) {
@@ -130,7 +142,7 @@ export class GoogleFinanceProvider extends BaseCurrencyProvider {
         // Pattern for rate value in common Google Finance structure
         new RegExp(`"${from}-${to}"[^}]*"price"[^:]*:[^"]*"([0-9,]+\\.?[0-9]*)"`, 'i'),
         // Fallback pattern for any number after currency pair
-        new RegExp(`${from}/${to}[^0-9]*([0-9,]+\\.?[0-9]*)`, 'i')
+        new RegExp(`${from}/${to}[^0-9]*([0-9,]+\\.?[0-9]*)`, 'i'),
       ]
 
       for (const pattern of patterns) {

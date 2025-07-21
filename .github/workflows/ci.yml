@@ -2,18 +2,18 @@ name: CI
 
 on:
   push:
-    branches: [ main, master, develop ]
+    branches: [main, master, develop]
     paths:
       - 'packages/currencyx-js/**'
   pull_request:
-    branches: [ main, master, develop ]
+    branches: [main, master, develop]
     paths:
       - 'packages/currencyx-js/**'
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+
     strategy:
       matrix:
         node-version: [18, 20, 22]
@@ -55,7 +55,7 @@ jobs:
 
   build-check:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4

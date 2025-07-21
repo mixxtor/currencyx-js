@@ -4,7 +4,7 @@
  * Based on existing currency provider structure
  */
 
-import type { CurrencyProviderContract } from "../contracts/currency_provider"
+import type { CurrencyProviderContract } from '../contracts/currency_provider'
 
 // Currency codes based on ISO 4217
 export type CurrencyCode = string
@@ -124,17 +124,18 @@ export type InferProviders<T> = T extends CurrencyConfig<infer P> ? keyof P : ne
  */
 export type InferDefaultProvider<T extends CurrencyConfig> = T extends {
   default: infer D
-} ? D : never
+}
+  ? D
+  : never
 
 /**
  * Provider registry for type augmentation
  */
-export interface CurrencyProviders { [K: string]: CurrencyProviderContract }
+export interface CurrencyProviders {
+  [K: string]: CurrencyProviderContract
+}
 
 /**
  * Helper to get provider names with fallback
  */
-export type GetProviderNames<T extends CurrencyConfig> =
-  keyof CurrencyProviders extends never
-    ? InferProviders<T>
-    : keyof CurrencyProviders
+export type GetProviderNames<T extends CurrencyConfig> = keyof CurrencyProviders extends never ? InferProviders<T> : keyof CurrencyProviders

@@ -1,6 +1,6 @@
 /**
  * CurrencyX.js
- * 
+ *
  * Modern TypeScript currency converter with type inference
  * Fresh, clean, and optimized implementation
  */
@@ -20,18 +20,14 @@ export type {
   InferProviders,
   InferDefaultProvider,
   GetProviderNames,
-  CurrencyProviders
+  CurrencyProviders,
 } from './types/index.js'
 
 // Contracts
 export type { CurrencyProviderContract, ExtendedCurrencyProvider } from './contracts/currency_provider.js'
 
 // Providers
-export {
-  BaseCurrencyProvider,
-  GoogleFinanceProvider,
-  FixerProvider
-} from './providers/index.js'
+export { BaseCurrencyProvider, GoogleFinanceProvider, FixerProvider } from './providers/index.js'
 
 // Services
 export { CurrencyService, CurrencyServiceAbstract } from './services/index.js'

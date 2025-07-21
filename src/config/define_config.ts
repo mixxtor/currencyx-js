@@ -1,6 +1,6 @@
 /**
  * Configuration Helper
- * 
+ *
  * Provides type-safe configuration definition similar to @adonisjs/drive
  */
 
@@ -8,7 +8,7 @@ import type { CurrencyConfig, CurrencyProviders } from '../types/index.js'
 
 /**
  * Helper function to define currency configuration with type inference
- * 
+ *
  * @example
  * ```typescript
  * const config = defineConfig({

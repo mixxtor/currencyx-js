@@ -14,8 +14,8 @@ describe('CurrencyService API', () => {
       default: 'google' as const,
       providers: {
         google: exchanges.google({ base: 'USD' }),
-        fixer: exchanges.fixer({ accessKey: 'test-key' })
-      }
+        fixer: exchanges.fixer({ accessKey: 'test-key' }),
+      },
     })
   })
 
@@ -27,7 +27,7 @@ describe('CurrencyService API', () => {
         query: { from: 'USD', to: 'EUR', amount: 100 },
         info: { timestamp: Date.now(), rate: 0.85 },
         date: new Date().toISOString(),
-        result: 85
+        result: 85,
       }
 
       // Mock the provider's convert method
@@ -35,7 +35,7 @@ describe('CurrencyService API', () => {
       provider.convert = async () => mockResult
 
       const result = await currency.convert({ amount: 100, from: 'USD', to: 'EUR' })
-      
+
       expect(result.success).toBe(true)
       expect(result.result).toBe(85)
       expect(result.query.amount).toBe(100)
@@ -50,18 +50,18 @@ describe('CurrencyService API', () => {
         timestamp: Date.now(),
         date: new Date().toISOString(),
         base: 'USD',
-        rates: { EUR: 0.85, GBP: 0.73 }
+        rates: { EUR: 0.85, GBP: 0.73 },
       }
 
       // Mock the provider's latestRates method
       const provider = currency.getActiveProvider()
       provider.latestRates = async () => mockResult
 
-      const result = await currency.getExchangeRates({ 
-        base: 'USD', 
-        symbols: ['EUR', 'GBP'] 
+      const result = await currency.getExchangeRates({
+        base: 'USD',
+        symbols: ['EUR', 'GBP'],
       })
-      
+
       expect(result.success).toBe(true)
       expect(result.base).toBe('USD')
       expect(result.rates.EUR).toBe(0.85)
@@ -77,7 +77,7 @@ describe('CurrencyService API', () => {
         query: { from: 'USD', to: 'EUR', amount: 100 },
         info: { timestamp: Date.now(), rate: 0.85 },
         date: new Date().toISOString(),
-        result: 85
+        result: 85,
       }
 
       // Mock the provider's convert method
@@ -85,7 +85,7 @@ describe('CurrencyService API', () => {
       provider.convert = async () => mockResult
 
       const result = await currency.convertAmount(100, 'USD', 'EUR')
-      
+
       expect(result.success).toBe(true)
       expect(result.result).toBe(85)
       expect(result.query.amount).toBe(100)
@@ -100,7 +100,7 @@ describe('CurrencyService API', () => {
         timestamp: Date.now(),
         date: new Date().toISOString(),
         base: 'USD',
-        rates: { EUR: 0.85, GBP: 0.73 }
+        rates: { EUR: 0.85, GBP: 0.73 },
       }
 
       // Mock the provider's latestRates method
@@ -108,7 +108,7 @@ describe('CurrencyService API', () => {
       provider.latestRates = async () => mockResult
 
       const result = await currency.getRates('USD', ['EUR', 'GBP'])
-      
+
       expect(result.success).toBe(true)
       expect(result.base).toBe('USD')
       expect(result.rates.EUR).toBe(0.85)
@@ -147,7 +147,7 @@ describe('CurrencyService API', () => {
         query: { from: 'USD', to: 'EUR', amount: 100 },
         info: { timestamp: Date.now(), rate: 0.85 },
         date: new Date().toISOString(),
-        result: 85
+        result: 85,
       }
 
       // Mock the provider's convert method

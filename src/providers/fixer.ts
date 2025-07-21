@@ -1,10 +1,17 @@
 /**
  * Fixer.io Provider
- * 
+ *
  * Based on existing Fixer from providers/currency/services/fixer.ts
  */
 
-import type { CurrencyCode, ConversionResult, ExchangeRatesResult, FixerConfig, ExchangeRatesParams, ConvertParams } from '../types/index.js'
+import type {
+  CurrencyCode,
+  ConversionResult,
+  ExchangeRatesResult,
+  FixerConfig,
+  ExchangeRatesParams,
+  ConvertParams,
+} from '../types/index.js'
 import { BaseCurrencyProvider } from './base_provider.js'
 
 interface FixerResponse {
@@ -77,7 +84,7 @@ export class FixerProvider extends BaseCurrencyProvider {
       }
 
       const response = await fetch(url.toString(), {
-        signal: AbortSignal.timeout(this.timeout)
+        signal: AbortSignal.timeout(this.timeout),
       })
 
       if (!response.ok) {
@@ -87,22 +94,27 @@ export class FixerProvider extends BaseCurrencyProvider {
       const data: FixerResponse = await response.json()
 
       if (!data.success) {
-        return this.createExchangeRatesResult(this.base, {}, {
-          code: data.error?.code,
-          info: data.error?.info || 'Unknown error from Fixer.io',
-          type: data.error?.type || 'API_ERROR'
-        })
+        return this.createExchangeRatesResult(
+          this.base,
+          {},
+          {
+            code: data.error?.code,
+            info: data.error?.info || 'Unknown error from Fixer.io',
+            type: data.error?.type || 'API_ERROR',
+          }
+        )
       }
 
+      return this.createExchangeRatesResult(this.base, data.rates || {})
+    } catch (error) {
       return this.createExchangeRatesResult(
         this.base,
-        data.rates || {}
+        {},
+        {
+          info: error instanceof Error ? error.message : 'Failed to fetch exchange rates',
+          type: 'FETCH_ERROR',
+        }
       )
-    } catch (error) {
-      return this.createExchangeRatesResult(this.base, {}, {
-        info: error instanceof Error ? error.message : 'Failed to fetch exchange rates',
-        type: 'FETCH_ERROR'
-      })
     }
   }
 
@@ -123,7 +135,7 @@ export class FixerProvider extends BaseCurrencyProvider {
       url.searchParams.set('amount', amount.toString())
 
       const response = await fetch(url.toString(), {
-        signal: AbortSignal.timeout(this.timeout)
+        signal: AbortSignal.timeout(this.timeout),
       })
 
       if (!response.ok) {
@@ -136,21 +148,15 @@ export class FixerProvider extends BaseCurrencyProvider {
         return this.createConversionResult(amount, from, to, undefined, undefined, {
           code: data.error?.code,
           info: data.error?.info || 'Unknown error from Fixer.io',
-          type: data.error?.type || 'API_ERROR'
+          type: data.error?.type || 'API_ERROR',
         })
       }
 
-      return this.createConversionResult(
-        amount,
-        from,
-        to,
-        data.result,
-        data.info?.rate
-      )
+      return this.createConversionResult(amount, from, to, data.result, data.info?.rate)
     } catch (error) {
       return this.createConversionResult(amount, from, to, undefined, undefined, {
         info: error instanceof Error ? error.message : 'Conversion failed',
-        type: 'CONVERSION_ERROR'
+        type: 'CONVERSION_ERROR',
       })
     }
   }
@@ -207,7 +213,7 @@ export class FixerProvider extends BaseCurrencyProvider {
       url.searchParams.set('symbols', 'USD')
 
       const response = await fetch(url.toString(), {
-        signal: AbortSignal.timeout(this.timeout)
+        signal: AbortSignal.timeout(this.timeout),
       })
 
       if (!response.ok) {

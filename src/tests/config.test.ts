@@ -11,16 +11,16 @@ describe('defineConfig', () => {
       default: 'google' as const,
       providers: {
         google: exchanges.google({ base: 'USD' }),
-        fixer: exchanges.fixer({ accessKey: 'test-key' })
-      }
+        fixer: exchanges.fixer({ accessKey: 'test-key' }),
+      },
     })
 
     expect(config).toEqual({
       default: 'google',
       providers: {
         google: exchanges.google({ base: 'USD' }),
-        fixer: exchanges.fixer({ accessKey: 'test-key' })
-      }
+        fixer: exchanges.fixer({ accessKey: 'test-key' }),
+      },
     })
   })
 
@@ -28,8 +28,8 @@ describe('defineConfig', () => {
     const originalConfig = {
       default: 'google' as const,
       providers: {
-        google: exchanges.google({ base: 'USD', timeout: 5000 })
-      }
+        google: exchanges.google({ base: 'USD', timeout: 5000 }),
+      },
     }
 
     const config = defineConfig(originalConfig)
@@ -50,7 +50,7 @@ describe('Provider Configuration Helpers', () => {
     it('should create Google Finance configuration with custom values', () => {
       const config = google({
         base: 'EUR',
-        timeout: 10000
+        timeout: 10000,
       })
 
       expect(config.base).toBe('EUR')
@@ -60,7 +60,7 @@ describe('Provider Configuration Helpers', () => {
 
     it('should override defaults with provided values', () => {
       const config = google({
-        base: 'GBP'
+        base: 'GBP',
         // timeout not provided, should use default
       })
 
@@ -73,7 +73,7 @@ describe('Provider Configuration Helpers', () => {
   describe('fixer', () => {
     it('should create Fixer configuration with required accessKey', () => {
       const config = fixer({
-        accessKey: 'test-api-key'
+        accessKey: 'test-api-key',
       })
 
       expect(config.base).toBe('USD')
@@ -85,7 +85,7 @@ describe('Provider Configuration Helpers', () => {
       const config = fixer({
         accessKey: 'test-api-key',
         base: 'USD',
-        timeout: 10000
+        timeout: 10000,
       })
 
       expect(config.base).toBe('USD')
@@ -97,7 +97,7 @@ describe('Provider Configuration Helpers', () => {
       expect(() => {
         fixer({
           // @ts-expect-error - Testing missing accessKey
-          base: 'EUR'
+          base: 'EUR',
         } as any)
       }).toThrow('Fixer provider requires an accessKey')
     })
@@ -105,13 +105,11 @@ describe('Provider Configuration Helpers', () => {
     it('should throw error when accessKey is empty', () => {
       expect(() => {
         fixer({
-          accessKey: ''
+          accessKey: '',
         })
       }).toThrow('Fixer provider requires an accessKey')
     })
   })
-
-
 
   describe('exchanges object', () => {
     it('should export all provider helpers', () => {
@@ -127,8 +125,8 @@ describe('Provider Configuration Helpers', () => {
         default: 'google' as const,
         providers: {
           google: exchanges.google({ base: 'USD' }),
-          fixer: exchanges.fixer({ accessKey: 'test-key' })
-        }
+          fixer: exchanges.fixer({ accessKey: 'test-key' }),
+        },
       })
 
       expect(config.providers.google.base).toBe('USD')
@@ -150,8 +148,8 @@ describe('Type Safety', () => {
       default: 'google' as const,
       providers: {
         google: exchanges.google(),
-        fixer: exchanges.fixer({ accessKey: 'test-key' })
-      }
+        fixer: exchanges.fixer({ accessKey: 'test-key' }),
+      },
     })
 
     type ProviderNames = keyof typeof config.providers
@@ -163,8 +161,8 @@ describe('Type Safety', () => {
     const validConfig = defineConfig({
       default: 'google' as const,
       providers: {
-        google: exchanges.google()
-      }
+        google: exchanges.google(),
+      },
     })
 
     expect(validConfig).toBeDefined()

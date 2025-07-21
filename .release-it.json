@@ -22,19 +22,10 @@
     "otp": false
   },
   "hooks": {
-    "before:init": [
-      "npm run lint",
-      "npm run typecheck"
-    ],
-    "after:bump": [
-      "npm run build"
-    ],
-    "before:release": [
-      "npm test"
-    ],
-    "after:release": [
-      "echo 🎉 Release ${version} completed successfully!"
-    ]
+    "before:init": ["npm run lint", "npm run typecheck"],
+    "after:bump": ["npm run build"],
+    "before:release": ["npm test"],
+    "after:release": ["echo 🎉 Release ${version} completed successfully!"]
   },
   "plugins": {
     "@release-it/conventional-changelog": {

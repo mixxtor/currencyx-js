@@ -11,7 +11,7 @@ describe('GoogleFinanceProvider', () => {
   beforeEach(() => {
     provider = new GoogleFinanceProvider({
       base: 'USD',
-      timeout: 5000
+      timeout: 5000,
     })
   })
 
@@ -43,7 +43,7 @@ describe('GoogleFinanceProvider', () => {
   it('should filter currencies by name', () => {
     const dollarCurrencies = provider.filterByName('dollar')
     expect(dollarCurrencies.length).toBeGreaterThan(0)
-    expect(dollarCurrencies.some(c => c.code === 'USD')).toBe(true)
+    expect(dollarCurrencies.some((c) => c.code === 'USD')).toBe(true)
   })
 
   it('should round values correctly', () => {
@@ -60,7 +60,7 @@ describe('FixerProvider', () => {
     provider = new FixerProvider({
       accessKey: 'test-api-key',
       base: 'EUR',
-      timeout: 5000
+      timeout: 5000,
     })
   })
 
@@ -110,7 +110,7 @@ describe('Base Provider Functionality', () => {
   it('should filter by country', () => {
     const usCurrencies = provider.filterByCountry('US')
     expect(usCurrencies.length).toBeGreaterThan(0)
-    expect(usCurrencies.some(c => c.code === 'USD')).toBe(true)
+    expect(usCurrencies.some((c) => c.code === 'USD')).toBe(true)
   })
 
   it('should get currency by country', () => {
@@ -135,7 +135,7 @@ describe('Base Provider Functionality', () => {
     // Test the formatCurrency method from base provider
     const formatted = new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD'
+      currency: 'USD',
     }).format(1234.56)
     expect(formatted).toBe('$1,234.56')
   })

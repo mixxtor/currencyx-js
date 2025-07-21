@@ -27,8 +27,8 @@ const config = defineConfig({
   default: 'google' as const,
   providers: {
     google: exchanges.google({ base: 'USD' }),
-    fixer: exchanges.fixer({ accessKey: 'your-api-key' })
-  }
+    fixer: exchanges.fixer({ accessKey: 'your-api-key' }),
+  },
 })
 
 const currency = createCurrency(config)
@@ -42,8 +42,8 @@ const result2 = await currency.convertAmount(100, 'USD', 'EUR')
 console.log(result2.result) // 85.23
 
 // Type-safe provider switching
-currency.use('google')    // ✅ Valid
-currency.use('fixer')     // ✅ Valid
+currency.use('google') // ✅ Valid
+currency.use('fixer') // ✅ Valid
 // currency.use('invalid') // ❌ TypeScript error
 ```
 
@@ -54,8 +54,8 @@ const config = defineConfig({
   default: 'google' as const,
   providers: {
     google: exchanges.google({ base: 'USD' }),
-    fixer: exchanges.fixer({ accessKey: process.env.FIXER_API_KEY! })
-  }
+    fixer: exchanges.fixer({ accessKey: process.env.FIXER_API_KEY! }),
+  },
 })
 
 const currency = createCurrency(config)
@@ -71,30 +71,32 @@ currency.use('fixer')
 ## 🌍 Providers
 
 ### Google Finance (Free)
+
 ```typescript
 providers: {
   google: exchanges.google({
-    base: 'USD',      // Optional: base currency
-    timeout: 5000     // Optional: request timeout
+    base: 'USD', // Optional: base currency
+    timeout: 5000, // Optional: request timeout
   })
 }
 ```
 
 ### Fixer.io (API Key Required)
+
 ```typescript
 providers: {
   fixer: exchanges.fixer({
-    accessKey: 'your-api-key',  // Required
-    base: 'EUR',                // Optional: base currency
-    timeout: 5000               // Optional: request timeout
+    accessKey: 'your-api-key', // Required
+    base: 'EUR', // Optional: base currency
+    timeout: 5000, // Optional: request timeout
   })
 }
 ```
 
-
 ### Integration (Advanced)
 
 ### 1. Configuration
+
 ```typescript
 // config/currency.ts
 import { defineConfig, exchanges } from '@mixxtor/currencyx-js'
@@ -103,8 +105,8 @@ const currencyConfig = defineConfig({
   default: 'google' as const,
   providers: {
     google: exchanges.google({ base: 'USD' }),
-    fixer: exchanges.fixer({ accessKey: process.env.get('FIXER_API_KEY') })
-  }
+    fixer: exchanges.fixer({ accessKey: process.env.get('FIXER_API_KEY') }),
+  },
 })
 
 export default currencyConfig
@@ -116,6 +118,7 @@ declare module '@mixxtor/currencyx-js' {
 ```
 
 ### 2. Usage
+
 ```typescript
 import { createCurrency } from '@mixxtor/currencyx-js'
 import currencyConfig from 'config/currency'
@@ -124,8 +127,8 @@ import currencyConfig from 'config/currency'
 const currency = createCurrency(currencyConfig)
 
 // Type-safe provider switching
-currency.use('google')   // ✅
-currency.use('fixer')    // ✅
+currency.use('google') // ✅
+currency.use('fixer') // ✅
 // currency.use('invalid') // ❌ TypeScript error
 
 const result = await currency.convert({ amount: 100, from: 'USD', to: 'EUR' })
@@ -142,12 +145,12 @@ CurrencyX.js uses object-based parameters for **core conversion methods** where 
 await currency.convert({
   amount: 100,
   from: 'USD',
-  to: 'EUR'
+  to: 'EUR',
 })
 
 await currency.getExchangeRates({
   base: 'USD',
-  symbols: ['EUR', 'GBP']
+  symbols: ['EUR', 'GBP'],
 })
 
 // ✅ Backward compatibility methods available
@@ -161,6 +164,7 @@ currency.formatCurrency(100, 'USD', 'en-US')
 ```
 
 **Why selective approach:**
+
 - **Core methods benefit most**: `convert()` and `getExchangeRates()` have multiple parameters
 - **Simple methods stay simple**: Single-parameter methods don't need object wrapping
 - **Consistent with ecosystem**: Follows patterns like `fetch()` API design
@@ -207,6 +211,7 @@ await currency.getProvidersHealth()
 You can create custom providers by extending `BaseCurrencyProvider`:
 
 ### Custom Provider
+
 ```typescript
 import { BaseCurrencyProvider } from '@mixxtor/currencyx-js'
 import type { CurrencyCode, ConversionResult, ExchangeRatesResult } from '@mixxtor/currencyx-js'
@@ -231,7 +236,7 @@ class MyCustomProvider extends BaseCurrencyProvider {
     if (!rate) {
       return this.createConversionResult(amount, from, to, undefined, undefined, {
         info: 'Rate not found',
-        type: 'RATE_NOT_FOUND'
+        type: 'RATE_NOT_FOUND',
       })
     }
 
@@ -254,8 +259,8 @@ class MyCustomProvider extends BaseCurrencyProvider {
 const config = defineConfig({
   default: 'mycustom' as const,
   providers: {
-    mycustom: new MyCustomProvider({ apiKey: 'your-key' })
-  }
+    mycustom: new MyCustomProvider({ apiKey: 'your-key' }),
+  },
 })
 ```
 

@@ -1,6 +1,6 @@
 /**
  * Factory Function
- * 
+ *
  * Creates a typed currency service with provider inference
  */
 
@@ -9,7 +9,7 @@ import { CurrencyService } from './services/index.js'
 
 /**
  * Create a typed currency service with provider inference
- * 
+ *
  * @example
  * ```typescript
  * const config = defineConfig({
@@ -19,9 +19,9 @@ import { CurrencyService } from './services/index.js'
  *     fixer: { accessKey: 'your-key' }
  *   }
  * })
- * 
+ *
  * const currency = createCurrency(config)
- * 
+ *
  * // TypeScript knows these are valid
  * currency.use('google')  // ✅
  * currency.use('fixer')   // ✅

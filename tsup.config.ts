@@ -14,6 +14,6 @@ export default defineConfig({
   external: [],
   noExternal: [],
   banner: {
-    js: '// CurrencyX.js - Modern TypeScript currency converter'
-  }
+    js: '// CurrencyX.js - Modern TypeScript currency converter',
+  },
 })
