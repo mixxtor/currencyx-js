@@ -12,7 +12,6 @@ export type {
   ExchangeRatesParams,
   ConversionResult,
   ExchangeRatesResult,
-  HealthCheckResult,
   CurrencyInfo,
   GoogleFinanceConfig,
   FixerConfig,
@@ -24,16 +23,16 @@ export type {
 } from './types/index.js'
 
 // Contracts
-export type { CurrencyProviderContract, ExtendedCurrencyProvider } from './contracts/currency_provider.js'
+export type { CurrencyProviderContract } from './contracts/currency_provider.js'
 
 // Providers
 export { BaseCurrencyProvider, GoogleFinanceProvider, FixerProvider } from './providers/index.js'
 
 // Services
-export { CurrencyService, CurrencyServiceAbstract } from './services/index.js'
+export { CurrencyService } from './services/index.js'
 
 // Configuration
-export { defineConfig, exchanges, google, fixer } from './config/index.js'
+export { defineConfig, exchanges } from './config/index.js'
 
 // Factory
 export { createCurrency } from './factory.js'

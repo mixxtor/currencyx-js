@@ -3,7 +3,8 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import { defineConfig, exchanges, google, fixer } from '../config/index.js'
+import { defineConfig, exchanges } from '../config/index.js'
+import type { FixerConfig } from '../types/index.js'
 
 describe('defineConfig', () => {
   it('should define configuration with type inference', () => {
@@ -40,7 +41,7 @@ describe('defineConfig', () => {
 describe('Provider Configuration Helpers', () => {
   describe('google', () => {
     it('should create Google Finance configuration with defaults', () => {
-      const config = google()
+      const config = exchanges.google()
 
       expect(config.base).toBe('USD')
       expect(config.name).toBe('google')
@@ -48,7 +49,7 @@ describe('Provider Configuration Helpers', () => {
     })
 
     it('should create Google Finance configuration with custom values', () => {
-      const config = google({
+      const config = exchanges.google({
         base: 'EUR',
         timeout: 10000,
       })
@@ -59,7 +60,7 @@ describe('Provider Configuration Helpers', () => {
     })
 
     it('should override defaults with provided values', () => {
-      const config = google({
+      const config = exchanges.google({
         base: 'GBP',
         // timeout not provided, should use default
       })
@@ -72,7 +73,7 @@ describe('Provider Configuration Helpers', () => {
 
   describe('fixer', () => {
     it('should create Fixer configuration with required accessKey', () => {
-      const config = fixer({
+      const config = exchanges.fixer({
         accessKey: 'test-api-key',
       })
 
@@ -82,7 +83,7 @@ describe('Provider Configuration Helpers', () => {
     })
 
     it('should create Fixer configuration with custom values', () => {
-      const config = fixer({
+      const config = exchanges.fixer({
         accessKey: 'test-api-key',
         base: 'USD',
         timeout: 10000,
@@ -95,18 +96,13 @@ describe('Provider Configuration Helpers', () => {
 
     it('should throw error when accessKey is missing', () => {
       expect(() => {
-        fixer({
-          // @ts-expect-error - Testing missing accessKey
-          base: 'EUR',
-        } as any)
+        exchanges.fixer({ base: 'EUR' } as FixerConfig)
       }).toThrow('Fixer provider requires an accessKey')
     })
 
     it('should throw error when accessKey is empty', () => {
       expect(() => {
-        fixer({
-          accessKey: '',
-        })
+        exchanges.fixer({ accessKey: '' })
       }).toThrow('Fixer provider requires an accessKey')
     })
   })

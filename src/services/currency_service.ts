@@ -9,7 +9,6 @@ import type {
   GetProviderNames,
   ConversionResult,
   ExchangeRatesResult,
-  HealthCheckResult,
   CurrencyCode,
   ConvertParams,
   ExchangeRatesParams,
@@ -17,63 +16,19 @@ import type {
 } from '../types/index.js'
 import type { CurrencyProviderContract } from '../contracts/currency_provider.js'
 
-/**
- * Abstract Currency Service Interface
- */
-export abstract class CurrencyServiceAbstract<T extends CurrencyConfig<CurrencyProviders> = CurrencyConfig<CurrencyProviders>> {
-  // Core methods with object parameters for clarity
-  abstract convert(params: ConvertParams): Promise<ConversionResult>
-  abstract getExchangeRates(params?: ExchangeRatesParams): Promise<ExchangeRatesResult>
-
-  // Convenience methods for backward compatibility (only for core methods)
-  async convertAmount(amount: number, from: CurrencyCode, to: CurrencyCode): Promise<ConversionResult> {
-    return this.convert({ amount, from, to })
-  }
-
-  async getRates(base?: CurrencyCode, symbols?: CurrencyCode[]): Promise<ExchangeRatesResult> {
-    return this.getExchangeRates({ base, symbols })
-  }
-
-  // Other methods keep simple positional parameters
-  abstract use<K extends keyof CurrencyProviders>(provider: K): CurrencyProviders[K]
-  abstract getCurrentProvider(): GetProviderNames<T> | undefined
-  abstract getAvailableProviders(): GetProviderNames<T>[]
-  abstract isHealthy(provider?: GetProviderNames<T>): Promise<boolean>
-  abstract round(value: number, precision?: number): number
-  abstract formatCurrency(amount: number, currencyCode: CurrencyCode, locale?: string): string
-  abstract convertAndFormat(
-    amount: number,
-    from: CurrencyCode,
-    to: CurrencyCode,
-    locale?: string
-  ): Promise<{
-    original: string
-    converted: string
-    rate: number
-  }>
-  abstract getProvidersHealth(): Promise<
-    Array<{
-      name: string
-      healthy: boolean
-      current: boolean
-    }>
-  >
-  abstract getProviderHealthInfo(provider?: GetProviderNames<T>): Promise<HealthCheckResult>
-  abstract getSupportedCurrencies(provider?: GetProviderNames<T>): Promise<CurrencyCode[]>
-}
+// Removed CurrencyServiceAbstract - unnecessary abstraction with only one implementation
 
 /**
  * Main Currency Service Implementation
  */
 export class CurrencyService<
   T extends CurrencyConfig<CurrencyProviders> = CurrencyConfig<CurrencyProviders>,
-> extends CurrencyServiceAbstract<T> {
+> {
   #providers: Map<string, CurrencyProviderContract> = new Map()
   #currentProvider?: string
   #config: T
 
   constructor(config: T) {
-    super()
     this.#config = config
     this.#initializeProviders()
     this.#currentProvider = String(config.default)
@@ -81,12 +36,20 @@ export class CurrencyService<
 
   /**
    * Initialize providers based on configuration
+   * Handles both provider instances and factory functions
    */
   #initializeProviders(): void {
     const providers = this.#config.providers
 
     for (const [name, provider] of Object.entries(providers)) {
-      this.#providers.set(name, provider)
+      // Check if provider is a factory function
+      if (typeof provider === 'function') {
+        // Call factory function to get provider instance
+        this.#providers.set(name, (provider as () => CurrencyProviderContract)())
+      } else {
+        // Provider is already an instance
+        this.#providers.set(name, provider)
+      }
     }
   }
 
@@ -94,7 +57,7 @@ export class CurrencyService<
    * Convert currency amount
    */
   async convert(params: ConvertParams): Promise<ConversionResult> {
-    const provider = this.getActiveProvider()
+    const provider = this.#getActiveProvider()
     return await provider.convert(params)
   }
 
@@ -102,7 +65,7 @@ export class CurrencyService<
    * Get exchange rates
    */
   async getExchangeRates(params?: ExchangeRatesParams): Promise<ExchangeRatesResult> {
-    const provider = this.getActiveProvider()
+    const provider = this.#getActiveProvider()
 
     // Set base currency if provided
     if (params?.base) {
@@ -110,6 +73,17 @@ export class CurrencyService<
     }
 
     return await provider.latestRates(params)
+  }
+
+  /**
+   * Convenience methods for backward compatibility
+   */
+  async convertAmount(amount: number, from: CurrencyCode, to: CurrencyCode): Promise<ConversionResult> {
+    return this.convert({ amount, from, to })
+  }
+
+  async getRates(base?: CurrencyCode, symbols?: CurrencyCode[]): Promise<ExchangeRatesResult> {
+    return this.getExchangeRates({ base, symbols })
   }
 
   /**
@@ -139,34 +113,17 @@ export class CurrencyService<
   }
 
   /**
-   * Check if a provider is healthy
-   */
-  async isHealthy(provider?: GetProviderNames<T>): Promise<boolean> {
-    const providerName = provider ? String(provider) : this.#currentProvider
-    if (!providerName) {
-      return false
-    }
-
-    const providerInstance = this.#providers.get(providerName)
-    if (!providerInstance) {
-      return false
-    }
-
-    return await providerInstance.isHealthy()
-  }
-
-  /**
    * Round currency value
    */
   round(value: number, precision: number = 2): number {
-    const provider = this.getActiveProvider()
+    const provider = this.#getActiveProvider()
     return provider.round(value, precision)
   }
 
   /**
    * Get active provider instance
    */
-  private getActiveProvider(): CurrencyProviderContract {
+  #getActiveProvider(): CurrencyProviderContract {
     if (!this.#currentProvider) {
       throw new Error('No provider is currently selected')
     }
@@ -177,30 +134,6 @@ export class CurrencyService<
     }
 
     return provider
-  }
-
-  /**
-   * Get all configured providers with their health status
-   */
-  async getProvidersHealth(): Promise<
-    Array<{
-      name: string
-      healthy: boolean
-      current: boolean
-    }>
-  > {
-    const results = []
-
-    for (const [name, provider] of this.#providers) {
-      const healthy = await provider.isHealthy()
-      results.push({
-        name,
-        healthy,
-        current: name === this.#currentProvider,
-      })
-    }
-
-    return results
   }
 
   /**
@@ -216,55 +149,6 @@ export class CurrencyService<
       // Fallback formatting
       return `${currencyCode} ${amount.toFixed(2)}`
     }
-  }
-
-  /**
-   * Convert and format in one step
-   */
-  async convertAndFormat(
-    amount: number,
-    from: CurrencyCode,
-    to: CurrencyCode,
-    locale: string = 'en-US'
-  ): Promise<{
-    original: string
-    converted: string
-    rate: number
-  }> {
-    const result = await this.convert({ amount, from, to })
-
-    if (!result.success || result.result === undefined) {
-      throw new Error(result.error?.info || 'Conversion failed')
-    }
-
-    return {
-      original: this.formatCurrency(amount, from, locale),
-      converted: this.formatCurrency(result.result, to, locale),
-      rate: result.info.rate || 0,
-    }
-  }
-
-  /**
-   * Get detailed health information for a provider
-   */
-  async getProviderHealthInfo(provider?: GetProviderNames<T>): Promise<HealthCheckResult> {
-    const providerName = provider ? String(provider) : this.#currentProvider
-    if (!providerName) {
-      return { healthy: false, error: 'No provider selected' }
-    }
-
-    const providerInstance = this.#providers.get(providerName)
-    if (!providerInstance) {
-      return { healthy: false, error: 'Provider not found' }
-    }
-
-    if ('getHealthInfo' in providerInstance && typeof providerInstance.getHealthInfo === 'function') {
-      return await providerInstance.getHealthInfo()
-    }
-
-    // Fallback to basic health check
-    const healthy = await providerInstance.isHealthy()
-    return { healthy }
   }
 
   /**

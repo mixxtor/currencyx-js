@@ -22,7 +22,7 @@ import type { GoogleFinanceConfig, FixerConfig } from '../types/index.js'
  * })
  * ```
  */
-export function google(config: GoogleFinanceConfig = {}): GoogleFinanceProvider {
+function google(config: GoogleFinanceConfig = {}): GoogleFinanceProvider {
   return new GoogleFinanceProvider({
     base: config.base || 'USD',
     timeout: config.timeout || 5000,
@@ -46,7 +46,7 @@ export function google(config: GoogleFinanceConfig = {}): GoogleFinanceProvider 
  * })
  * ```
  */
-export function fixer(config: FixerConfig): FixerProvider {
+function fixer(config: FixerConfig): FixerProvider {
   if (!config.accessKey) {
     throw new Error('Fixer provider requires an accessKey')
   }

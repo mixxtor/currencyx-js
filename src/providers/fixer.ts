@@ -197,33 +197,4 @@ export class FixerProvider extends BaseCurrencyProvider {
       return undefined
     }
   }
-
-  /**
-   * Health check specific to Fixer.io
-   */
-  async isHealthy(): Promise<boolean> {
-    try {
-      if (!this.accessKey) {
-        return false
-      }
-
-      const url = new URL(`${this.baseUrl}/latest`)
-      url.searchParams.set('access_key', this.accessKey)
-      url.searchParams.set('base', 'EUR')
-      url.searchParams.set('symbols', 'USD')
-
-      const response = await fetch(url.toString(), {
-        signal: AbortSignal.timeout(this.timeout),
-      })
-
-      if (!response.ok) {
-        return false
-      }
-
-      const data: FixerResponse = await response.json()
-      return data.success && !!data.rates?.USD
-    } catch {
-      return false
-    }
-  }
 }

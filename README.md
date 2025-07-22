@@ -187,7 +187,6 @@ await currency.getRates(base?, symbols?)
 currency.use(provider)
 currency.getCurrentProvider()
 currency.getAvailableProviders()
-await currency.isHealthy(provider?)
 currency.round(value, precision?)
 ```
 

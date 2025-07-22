@@ -2,4 +2,4 @@
  * Services Export
  */
 
-export { CurrencyService, CurrencyServiceAbstract } from './currency_service.js'
+export { CurrencyService } from './currency_service.js'

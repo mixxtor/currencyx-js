@@ -49,7 +49,6 @@ currency.getAvailableProviders()
 // Utility methods
 currency.round(123.456, 2)
 currency.formatCurrency(100, 'USD', 'en-US')
-await currency.isHealthy('google')
 
 // Configuration
 provider.setBase('USD')

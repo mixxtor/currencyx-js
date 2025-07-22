@@ -1,9 +1,3 @@
-/**
- * Core Types for CurrencyX.js
- *
- * Based on existing currency provider structure
- */
-
 import type { CurrencyProviderContract } from '../contracts/currency_provider'
 
 // Currency codes based on ISO 4217
@@ -66,15 +60,6 @@ export interface ExchangeRatesResult extends BaseResult {
 }
 
 /**
- * Provider health check result
- */
-export interface HealthCheckResult {
-  healthy: boolean
-  latency?: number
-  error?: string
-}
-
-/**
  * Currency information from the currency list
  */
 export interface CurrencyInfo {
@@ -93,7 +78,7 @@ export interface CurrencyInfo {
 /**
  * Provider configuration interfaces
  */
-export interface BaseConfig extends Record<string, any> {
+export interface BaseConfig extends Record<string, unknown> {
   base?: CurrencyCode
   timeout?: number
 }
