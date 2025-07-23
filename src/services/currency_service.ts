@@ -12,9 +12,9 @@ import type {
   CurrencyCode,
   ConvertParams,
   ExchangeRatesParams,
-  CurrencyProviders,
+  CurrencyExchanges,
 } from '../types/index.js'
-import type { CurrencyProviderContract } from '../contracts/currency_provider.js'
+import type { CurrencyExchangeContract } from '../contracts/currency_provider.js'
 
 // Removed CurrencyServiceAbstract - unnecessary abstraction with only one implementation
 
@@ -22,9 +22,9 @@ import type { CurrencyProviderContract } from '../contracts/currency_provider.js
  * Main Currency Service Implementation
  */
 export class CurrencyService<
-  T extends CurrencyConfig<CurrencyProviders> = CurrencyConfig<CurrencyProviders>,
+  T extends CurrencyConfig<CurrencyExchanges> = CurrencyConfig<CurrencyExchanges>,
 > {
-  #providers: Map<string, CurrencyProviderContract> = new Map()
+  #providers: Map<string, CurrencyExchangeContract> = new Map()
   #currentProvider?: string
   #config: T
 
@@ -45,7 +45,7 @@ export class CurrencyService<
       // Check if provider is a factory function
       if (typeof provider === 'function') {
         // Call factory function to get provider instance
-        this.#providers.set(name, (provider as () => CurrencyProviderContract)())
+        this.#providers.set(name, (provider as () => CurrencyExchangeContract)())
       } else {
         // Provider is already an instance
         this.#providers.set(name, provider)
@@ -89,13 +89,13 @@ export class CurrencyService<
   /**
    * Switch to a different provider (type-safe)
    */
-  use<K extends keyof CurrencyProviders>(provider: K): CurrencyProviders[K] {
+  use<K extends keyof CurrencyExchanges>(provider: K): CurrencyExchanges[K] {
     const providerName = String(provider)
     if (!this.#providers.has(providerName)) {
       throw new Error(`Provider '${providerName}' is not configured`)
     }
     this.#currentProvider = providerName
-    return this.#providers.get(providerName) as CurrencyProviders[K]
+    return this.#providers.get(providerName) as CurrencyExchanges[K]
   }
 
   /**
@@ -123,7 +123,7 @@ export class CurrencyService<
   /**
    * Get active provider instance
    */
-  #getActiveProvider(): CurrencyProviderContract {
+  #getActiveProvider(): CurrencyExchangeContract {
     if (!this.#currentProvider) {
       throw new Error('No provider is currently selected')
     }

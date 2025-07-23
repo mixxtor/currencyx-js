@@ -16,17 +16,16 @@ export type {
   GoogleFinanceConfig,
   FixerConfig,
   CurrencyConfig,
-  InferProviders,
-  InferDefaultProvider,
+  InferExchanges,
   GetProviderNames,
-  CurrencyProviders,
+  CurrencyExchanges,
 } from './types/index.js'
 
 // Contracts
-export type { CurrencyProviderContract } from './contracts/currency_provider.js'
+export type { CurrencyExchangeContract } from './contracts/currency_provider.js'
 
 // Providers
-export { BaseCurrencyProvider, GoogleFinanceProvider, FixerProvider } from './providers/index.js'
+export { BaseCurrencyExchange, GoogleFinanceProvider, FixerProvider } from './exchanges/index.js'
 
 // Services
 export { CurrencyService } from './services/index.js'

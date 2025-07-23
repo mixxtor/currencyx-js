@@ -12,9 +12,9 @@ import type {
   ExchangeRatesParams,
   ConvertParams,
 } from '../types/index.js'
-import { BaseCurrencyProvider } from './base_provider.js'
+import { BaseCurrencyExchange } from './base_exchange.js'
 
-export class GoogleFinanceProvider extends BaseCurrencyProvider {
+export class GoogleFinanceProvider extends BaseCurrencyExchange {
   readonly name = 'google'
 
   private baseUrl = 'https://www.google.com/finance'

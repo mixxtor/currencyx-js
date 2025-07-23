@@ -12,7 +12,7 @@ import type {
   ExchangeRatesParams,
   ConvertParams,
 } from '../types/index.js'
-import { BaseCurrencyProvider } from './base_provider.js'
+import { BaseCurrencyExchange } from './base_exchange.js'
 
 interface FixerResponse {
   success: boolean
@@ -47,7 +47,7 @@ interface FixerConvertResponse {
   }
 }
 
-export class FixerProvider extends BaseCurrencyProvider {
+export class FixerProvider extends BaseCurrencyExchange {
   readonly name = 'fixer'
 
   private baseUrl = 'http://data.fixer.io/api'

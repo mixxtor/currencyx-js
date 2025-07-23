@@ -12,10 +12,10 @@ import type {
   ExchangeRatesParams,
   CurrencyInfo,
 } from '../types/index.js'
-import type { CurrencyProviderContract } from '../contracts/currency_provider.js'
-import { getCommonCurrencyCodes } from '../data/currencies.js'
+import type { CurrencyExchangeContract } from '../contracts/currency_provider.js'
+import { getCurrencyList } from '../data/currencies.js'
 
-export abstract class BaseCurrencyProvider implements CurrencyProviderContract {
+export abstract class BaseCurrencyExchange implements CurrencyExchangeContract {
   /**
    * Provider name - must be implemented by subclasses
    */
@@ -29,16 +29,57 @@ export abstract class BaseCurrencyProvider implements CurrencyProviderContract {
   /**
    * Get all supported currencies
    */
-  public get currencies(): CurrencyCode[] {
-    return getCommonCurrencyCodes()
+  public get currencies() {
+    return getCurrencyList().map(c => c.code)
   }
 
   /**
-   * Set supported currencies (for testing/configuration)
+   * Get all currencies
    */
-  public set currencies(_value: CurrencyCode[]) {
-    // This setter is mainly for compatibility with tests
-    // In practice, currencies are derived from COMMON_CURRENCIES
+  getList() {
+    return getCurrencyList()
+  }
+
+  /**
+   * Filter currencies by name
+   */
+  filterByName(name: string) {
+    return this.getList().filter((c) => c.name.includes(name))
+  }
+
+  /**
+   * Filter currencies by country
+   */
+  filterByCountry(iso2: string) {
+    return this.getList().filter((c) => c.countries.includes(iso2))
+  }
+
+  /**
+   * Get currency info by country ISO2 code (e.g., 'US')
+   */
+  getByCountry(iso2: string) {
+    return this.getList().find((c) => c.countries.includes(iso2))
+  }
+
+  /**
+   * Get currency info by ISO code (e.g., 'USD')
+   */
+  getByCode(code: CurrencyCode) {
+    return this.getList().find((c) => c.code === code)
+  }
+
+  /**
+   * Get currency info by symbol (e.g., '$')
+   */
+  getBySymbol(symbol: string) {
+    return this.getList().find((c) => c.symbol === symbol)
+  }
+
+  /**
+   * Get currency info by numeric code (e.g., '840')
+   */
+  getByNumericCode(numCode: string) {
+    return this.getList().find((c) => c.numeric_code === numCode)
   }
 
   /**

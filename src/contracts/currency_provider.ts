@@ -1,15 +1,15 @@
 import type {
   CurrencyCode,
   ConversionResult,
+  ExchangeRatesParams,
   ExchangeRatesResult,
   ConvertParams,
-  ExchangeRatesParams,
 } from '../types/index.js'
 
 /**
  * Main contract that all currency providers must implement
  */
-export interface CurrencyProviderContract {
+export interface CurrencyExchangeContract {
   /**
    * Provider name for identification
    */
@@ -19,6 +19,11 @@ export interface CurrencyProviderContract {
    * Base currency code. Default is 'USD'.
    */
   base: CurrencyCode
+
+  /**
+   * Get supported currencies
+   */
+  currencies: CurrencyCode[]
 
   /**
    * Set base currency
@@ -49,9 +54,4 @@ export interface CurrencyProviderContract {
    * Round currency value
    */
   round(value: number, precision?: number): number
-
-  /**
-   * Get supported currencies
-   */
-  currencies: CurrencyCode[]
 }

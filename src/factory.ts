@@ -4,7 +4,7 @@
  * Creates a typed currency service with provider inference
  */
 
-import type { CurrencyConfig, CurrencyProviders } from './types/index.js'
+import type { CurrencyConfig, CurrencyExchanges } from './types/index.js'
 import { CurrencyService } from './services/index.js'
 
 /**
@@ -28,7 +28,7 @@ import { CurrencyService } from './services/index.js'
  * // currency.use('invalid') // ❌ TypeScript error
  * ```
  */
-export function createCurrency<T extends CurrencyConfig<CurrencyProviders> = CurrencyConfig<CurrencyProviders>>(
+export function createCurrency<T extends CurrencyConfig<CurrencyExchanges> = CurrencyConfig<CurrencyExchanges>>(
   config: T
 ): CurrencyService<T> {
   return new CurrencyService<T>(config)

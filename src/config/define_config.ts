@@ -4,7 +4,7 @@
  * Provides type-safe configuration definition similar to @adonisjs/drive
  */
 
-import type { CurrencyConfig, CurrencyProviders } from '../types/index.js'
+import type { CurrencyConfig, CurrencyExchanges } from '../types/index.js'
 
 /**
  * Helper function to define currency configuration with type inference
@@ -20,6 +20,6 @@ import type { CurrencyConfig, CurrencyProviders } from '../types/index.js'
  * })
  * ```
  */
-export function defineConfig<T extends CurrencyProviders>(config: CurrencyConfig<T>): CurrencyConfig<T> {
+export function defineConfig<T extends CurrencyExchanges>(config: CurrencyConfig<T>): CurrencyConfig<T> {
   return config
 }

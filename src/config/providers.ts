@@ -5,8 +5,8 @@
  * Provides typed configuration helpers for each provider
  */
 
-import { FixerProvider } from '../providers/fixer.js'
-import { GoogleFinanceProvider } from '../providers/google_finance.js'
+import { FixerProvider } from '../exchanges/fixer.js'
+import { GoogleFinanceProvider } from '../exchanges/google_finance.js'
 import type { GoogleFinanceConfig, FixerConfig } from '../types/index.js'
 
 /**

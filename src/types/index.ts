@@ -1,4 +1,4 @@
-import type { CurrencyProviderContract } from '../contracts/currency_provider'
+import type { CurrencyExchangeContract } from '../contracts/currency_provider'
 
 // Currency codes based on ISO 4217
 export type CurrencyCode = string
@@ -83,7 +83,7 @@ export interface BaseConfig extends Record<string, unknown> {
   timeout?: number
 }
 
-export interface GoogleFinanceConfig extends BaseConfig {}
+export interface GoogleFinanceConfig extends BaseConfig { }
 
 export interface FixerConfig extends BaseConfig {
   accessKey: string
@@ -92,7 +92,7 @@ export interface FixerConfig extends BaseConfig {
 /**
  * Main currency configuration interface
  */
-export interface CurrencyConfig<T extends CurrencyProviders = CurrencyProviders> {
+export interface CurrencyConfig<T extends CurrencyExchanges = CurrencyExchanges> {
   /** Default provider to use for currency operations */
   default: keyof T
   /** Available currency providers configuration */
@@ -102,25 +102,14 @@ export interface CurrencyConfig<T extends CurrencyProviders = CurrencyProviders>
 /**
  * Infer available provider names from configuration
  */
-export type InferProviders<T> = T extends CurrencyConfig<infer P> ? keyof P : never
-
-/**
- * Infer default provider from configuration
- */
-export type InferDefaultProvider<T extends CurrencyConfig> = T extends {
-  default: infer D
-}
-  ? D
-  : never
+export type InferExchanges<T> = T extends CurrencyConfig<infer P> ? keyof P : never
 
 /**
  * Provider registry for type augmentation
  */
-export interface CurrencyProviders {
-  [K: string]: CurrencyProviderContract
-}
+export interface CurrencyExchanges { [K: string]: CurrencyExchangeContract }
 
 /**
  * Helper to get provider names with fallback
  */
-export type GetProviderNames<T extends CurrencyConfig> = keyof CurrencyProviders extends never ? InferProviders<T> : keyof CurrencyProviders
+export type GetProviderNames<T extends CurrencyConfig> = keyof CurrencyExchanges extends never ? InferExchanges<T> : keyof CurrencyExchanges

@@ -253,6 +253,10 @@ export const COMMON_CURRENCIES: CurrencyInfo[] = [
   },
 ]
 
+export function getCurrencyList() {
+  return COMMON_CURRENCIES
+}
+
 /**
  * Get currency codes from the common currencies list
  */
@@ -271,7 +275,7 @@ export function findCurrencyByCode(code: string): CurrencyInfo | undefined {
  * Filter currencies by name
  */
 export function filterCurrenciesByName(name: string): CurrencyInfo[] {
-  return COMMON_CURRENCIES.filter(c => 
+  return COMMON_CURRENCIES.filter(c =>
     c.name.toLowerCase().includes(name.toLowerCase())
   )
 }
@@ -280,7 +284,56 @@ export function filterCurrenciesByName(name: string): CurrencyInfo[] {
  * Filter currencies by country
  */
 export function filterCurrenciesByCountry(iso2: string): CurrencyInfo[] {
-  return COMMON_CURRENCIES.filter(c => 
+  return COMMON_CURRENCIES.filter(c =>
     c.countries.includes(iso2.toUpperCase())
   )
+}
+
+/**
+ * Get all currencies
+ */
+export function getList() {
+  return COMMON_CURRENCIES
+}
+
+/**
+ * Filter currencies by name
+ */
+export function filterByName(name: string) {
+  return COMMON_CURRENCIES.filter((c) => c.name.includes(name))
+}
+
+/**
+ * Filter currencies by country
+ */
+export function filterByCountry(iso2: string) {
+  return COMMON_CURRENCIES.filter((c) => c.countries.includes(iso2))
+}
+
+/**
+ * Get currency info by country ISO2 code (e.g., 'US')
+ */
+export function getByCountry(iso2: string) {
+  return COMMON_CURRENCIES.find((c) => c.countries.includes(iso2))
+}
+
+/**
+ * Get currency info by ISO code (e.g., 'USD')
+ */
+export function getByCode(code: string) {
+  return COMMON_CURRENCIES.find((c) => c.code === code)
+}
+
+/**
+ * Get currency info by symbol (e.g., '$')
+ */
+export function getBySymbol(symbol: string) {
+  return COMMON_CURRENCIES.find((c) => c.symbol === symbol)
+}
+
+/**
+ * Get currency info by numeric code (e.g., '840')
+ */
+export function getByNumericCode(numCode: string) {
+  return COMMON_CURRENCIES.find((c) => c.numeric_code === numCode)
 }
