@@ -1,29 +1,28 @@
 /**
- * Provider Configuration Exports
+ * Exchange Configuration Exports
  *
- * Similar to @adonisjs/drive services.fs() pattern
- * Provides typed configuration helpers for each provider
+ * Exchanges typed configuration helpers for each exchange
  */
 
-import { FixerProvider } from '../exchanges/fixer.js'
-import { GoogleFinanceProvider } from '../exchanges/google_finance.js'
+import { FixerExchange } from '../exchanges/fixer.js'
+import { GoogleFinanceExchange } from '../exchanges/google_finance.js'
 import type { GoogleFinanceConfig, FixerConfig } from '../types/index.js'
 
 /**
- * Google Finance provider configuration
+ * Google Finance exchange configuration
  *
  * @example
  * ```typescript
  * const config = defineConfig({
  *   default: 'google',
- *   providers: {
+ *   exchanges: {
  *     google: exchanges.google({ base: 'USD', timeout: 5000 })
  *   }
  * })
  * ```
  */
-function google(config: GoogleFinanceConfig = {}): GoogleFinanceProvider {
-  return new GoogleFinanceProvider({
+function google(config: GoogleFinanceConfig = {}): GoogleFinanceExchange {
+  return new GoogleFinanceExchange({
     base: config.base || 'USD',
     timeout: config.timeout || 5000,
     ...config,
@@ -31,13 +30,13 @@ function google(config: GoogleFinanceConfig = {}): GoogleFinanceProvider {
 }
 
 /**
- * Fixer.io provider configuration
+ * Fixer.io exchange configuration
  *
  * @example
  * ```typescript
  * const config = defineConfig({
  *   default: 'fixer',
- *   providers: {
+ *   exchanges: {
  *     fixer: exchanges.fixer({
  *       accessKey: env.get('FIXER_API_KEY'),
  *       base: 'EUR'
@@ -46,12 +45,12 @@ function google(config: GoogleFinanceConfig = {}): GoogleFinanceProvider {
  * })
  * ```
  */
-function fixer(config: FixerConfig): FixerProvider {
+function fixer(config: FixerConfig): FixerExchange {
   if (!config.accessKey) {
-    throw new Error('Fixer provider requires an accessKey')
+    throw new Error('Fixer exchange requires an accessKey')
   }
 
-  return new FixerProvider({
+  return new FixerExchange({
     base: config.base || 'USD',
     timeout: config.timeout || 5000,
     ...config,
@@ -59,7 +58,7 @@ function fixer(config: FixerConfig): FixerProvider {
 }
 
 /**
- * Provider configuration helpers
+ * Exchange configuration helpers
  * Similar to @adonisjs/drive's services object
  */
 export const exchanges = {

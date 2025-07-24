@@ -10,7 +10,7 @@ describe('defineConfig', () => {
   it('should define configuration with type inference', () => {
     const config = defineConfig({
       default: 'google' as const,
-      providers: {
+      exchanges: {
         google: exchanges.google({ base: 'USD' }),
         fixer: exchanges.fixer({ accessKey: 'test-key' }),
       },
@@ -18,7 +18,7 @@ describe('defineConfig', () => {
 
     expect(config).toEqual({
       default: 'google',
-      providers: {
+      exchanges: {
         google: exchanges.google({ base: 'USD' }),
         fixer: exchanges.fixer({ accessKey: 'test-key' }),
       },
@@ -28,7 +28,7 @@ describe('defineConfig', () => {
   it('should preserve exact configuration structure', () => {
     const originalConfig = {
       default: 'google' as const,
-      providers: {
+      exchanges: {
         google: exchanges.google({ base: 'USD', timeout: 5000 }),
       },
     }
@@ -38,7 +38,7 @@ describe('defineConfig', () => {
   })
 })
 
-describe('Provider Configuration Helpers', () => {
+describe('Exchange Configuration Helpers', () => {
   describe('google', () => {
     it('should create Google Finance configuration with defaults', () => {
       const config = exchanges.google()
@@ -97,18 +97,18 @@ describe('Provider Configuration Helpers', () => {
     it('should throw error when accessKey is missing', () => {
       expect(() => {
         exchanges.fixer({ base: 'EUR' } as FixerConfig)
-      }).toThrow('Fixer provider requires an accessKey')
+      }).toThrow('Fixer exchange requires an accessKey')
     })
 
     it('should throw error when accessKey is empty', () => {
       expect(() => {
         exchanges.fixer({ accessKey: '' })
-      }).toThrow('Fixer provider requires an accessKey')
+      }).toThrow('Fixer exchange requires an accessKey')
     })
   })
 
   describe('exchanges object', () => {
-    it('should export all provider helpers', () => {
+    it('should export all exchange helpers', () => {
       expect(exchanges).toHaveProperty('google')
       expect(exchanges).toHaveProperty('fixer')
 
@@ -119,44 +119,44 @@ describe('Provider Configuration Helpers', () => {
     it('should work with defineConfig', () => {
       const config = defineConfig({
         default: 'google' as const,
-        providers: {
+        exchanges: {
           google: exchanges.google({ base: 'USD' }),
           fixer: exchanges.fixer({ accessKey: 'test-key' }),
         },
       })
 
-      expect(config.providers.google.base).toBe('USD')
-      expect(config.providers.google.name).toBe('google')
-      expect(config.providers.google.currencies).toBeInstanceOf(Array)
-      expect(config.providers.google.currencies.length).toBeGreaterThan(0)
+      expect(config.exchanges.google.base).toBe('USD')
+      expect(config.exchanges.google.name).toBe('google')
+      expect(config.exchanges.google.currencies).toBeInstanceOf(Array)
+      expect(config.exchanges.google.currencies.length).toBeGreaterThan(0)
 
-      expect(config.providers.fixer.base).toBe('USD')
-      expect(config.providers.fixer.name).toBe('fixer')
-      expect(config.providers.fixer).toBeInstanceOf(Object)
+      expect(config.exchanges.fixer.base).toBe('USD')
+      expect(config.exchanges.fixer.name).toBe('fixer')
+      expect(config.exchanges.fixer).toBeInstanceOf(Object)
     })
   })
 })
 
 describe('Type Safety', () => {
-  it('should infer provider types correctly', () => {
+  it('should infer exchange types correctly', () => {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const config = defineConfig({
       default: 'google' as const,
-      providers: {
+      exchanges: {
         google: exchanges.google(),
         fixer: exchanges.fixer({ accessKey: 'test-key' }),
       },
     })
 
-    type ProviderNames = keyof typeof config.providers
-    const validProviders: ProviderNames[] = ['google', 'fixer']
-    expect(validProviders).toEqual(['google', 'fixer'])
+    type ExchangeNames = keyof typeof config.exchanges
+    const validexchanges: ExchangeNames[] = ['google', 'fixer']
+    expect(validexchanges).toEqual(['google', 'fixer'])
   })
 
   it('should enforce required configuration properties', () => {
     const validConfig = defineConfig({
       default: 'google' as const,
-      providers: {
+      exchanges: {
         google: exchanges.google(),
       },
     })

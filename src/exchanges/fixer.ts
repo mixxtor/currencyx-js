@@ -1,7 +1,5 @@
 /**
- * Fixer.io Provider
- *
- * Based on existing Fixer from providers/currency/services/fixer.ts
+ * Fixer.io Exchange
  */
 
 import type {
@@ -47,7 +45,7 @@ interface FixerConvertResponse {
   }
 }
 
-export class FixerProvider extends BaseCurrencyExchange {
+export class FixerExchange extends BaseCurrencyExchange {
   readonly name = 'fixer'
 
   private baseUrl = 'http://data.fixer.io/api'

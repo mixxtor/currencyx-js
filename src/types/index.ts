@@ -1,4 +1,4 @@
-import type { CurrencyExchangeContract } from '../contracts/currency_provider'
+import type { CurrencyExchangeContract } from '../contracts/currency_exchange'
 
 // Currency codes based on ISO 4217
 export type CurrencyCode = string
@@ -95,8 +95,8 @@ export interface FixerConfig extends BaseConfig {
 export interface CurrencyConfig<T extends CurrencyExchanges = CurrencyExchanges> {
   /** Default provider to use for currency operations */
   default: keyof T
-  /** Available currency providers configuration */
-  providers: T
+  /** Available currency exchanges configuration */
+  exchanges: T
 }
 
 /**
@@ -112,4 +112,4 @@ export interface CurrencyExchanges { [K: string]: CurrencyExchangeContract }
 /**
  * Helper to get provider names with fallback
  */
-export type GetProviderNames<T extends CurrencyConfig> = keyof CurrencyExchanges extends never ? InferExchanges<T> : keyof CurrencyExchanges
+export type GetExchangeNames<T extends CurrencyConfig> = keyof CurrencyExchanges extends never ? InferExchanges<T> : keyof CurrencyExchanges

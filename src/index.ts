@@ -17,15 +17,15 @@ export type {
   FixerConfig,
   CurrencyConfig,
   InferExchanges,
-  GetProviderNames,
+  GetExchangeNames,
   CurrencyExchanges,
 } from './types/index.js'
 
 // Contracts
-export type { CurrencyExchangeContract } from './contracts/currency_provider.js'
+export type { CurrencyExchangeContract } from './contracts/currency_exchange.js'
 
-// Providers
-export { BaseCurrencyExchange, GoogleFinanceProvider, FixerProvider } from './exchanges/index.js'
+// Exchanges
+export { BaseCurrencyExchange, GoogleFinanceExchange, FixerExchange } from './exchanges/index.js'
 
 // Services
 export { CurrencyService } from './services/index.js'

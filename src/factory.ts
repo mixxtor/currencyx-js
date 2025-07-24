@@ -1,22 +1,22 @@
 /**
  * Factory Function
  *
- * Creates a typed currency service with provider inference
+ * Creates a typed currency service with exchange inference
  */
 
 import type { CurrencyConfig, CurrencyExchanges } from './types/index.js'
 import { CurrencyService } from './services/index.js'
 
 /**
- * Create a typed currency service with provider inference
+ * Create a typed currency service with exchange inference
  *
  * @example
  * ```typescript
  * const config = defineConfig({
  *   default: 'google' as const,
- *   providers: {
- *     google: { base: 'USD' },
- *     fixer: { accessKey: 'your-key' }
+ *   exchanges: {
+ *     google: exchanges.google({ base: 'USD' }),
+ *     fixer: exchanges.fixer({ accessKey: 'your-key' })
  *   }
  * })
  *

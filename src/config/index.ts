@@ -3,4 +3,4 @@
  */
 
 export { defineConfig } from './define_config.js'
-export { exchanges } from './providers.js'
+export { exchanges } from './exchanges.js'

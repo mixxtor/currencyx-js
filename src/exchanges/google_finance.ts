@@ -1,7 +1,5 @@
 /**
- * Google Finance Provider
- *
- * Based on existing GoogleFinance from providers/currency/services/google_finance.ts
+ * Google Finance Exchange
  */
 
 import type {
@@ -14,7 +12,7 @@ import type {
 } from '../types/index.js'
 import { BaseCurrencyExchange } from './base_exchange.js'
 
-export class GoogleFinanceProvider extends BaseCurrencyExchange {
+export class GoogleFinanceExchange extends BaseCurrencyExchange {
   readonly name = 'google'
 
   private baseUrl = 'https://www.google.com/finance'

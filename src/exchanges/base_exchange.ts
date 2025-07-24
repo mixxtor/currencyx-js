@@ -1,7 +1,7 @@
 /**
- * Base Currency Provider
+ * Base Currency Exchange
  *
- * Simplified abstract base class for all currency providers
+ * Simplified abstract base class for all currency exchanges
  */
 
 import type {
@@ -12,12 +12,12 @@ import type {
   ExchangeRatesParams,
   CurrencyInfo,
 } from '../types/index.js'
-import type { CurrencyExchangeContract } from '../contracts/currency_provider.js'
+import type { CurrencyExchangeContract } from '../contracts/currency_exchange.js'
 import { getCurrencyList } from '../data/currencies.js'
 
 export abstract class BaseCurrencyExchange implements CurrencyExchangeContract {
   /**
-   * Provider name - must be implemented by subclasses
+   * Exchange name - must be implemented by subclasses
    */
   abstract readonly name: string
 
@@ -100,7 +100,7 @@ export abstract class BaseCurrencyExchange implements CurrencyExchangeContract {
   /**
    * Set API key (default implementation - can be overridden)
    * Default does implementation does nothing.
-   * Providers that need API keys should override this
+   * Exchanges that need API keys should override this
    */
   setKey(_key: string): this {
     return this

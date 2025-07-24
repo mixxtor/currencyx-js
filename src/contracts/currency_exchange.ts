@@ -7,11 +7,11 @@ import type {
 } from '../types/index.js'
 
 /**
- * Main contract that all currency providers must implement
+ * Main contract that all currency exchanges must implement
  */
 export interface CurrencyExchangeContract {
   /**
-   * Provider name for identification
+   * Exchange name for identification
    */
   readonly name: string
 
@@ -31,7 +31,7 @@ export interface CurrencyExchangeContract {
   setBase(currency: CurrencyCode): this
 
   /**
-   * Set API key (if required by provider)
+   * Set API key (if required by exchange)
    */
   setKey(key: string): this
 

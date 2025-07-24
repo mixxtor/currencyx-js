@@ -12,7 +12,7 @@ describe('CurrencyService Core Functionality', () => {
   beforeEach(() => {
     currency = createCurrency({
       default: 'google',
-      providers: {
+      exchanges: {
         google: exchanges.google({ base: 'USD' }),
       },
     })
@@ -62,19 +62,19 @@ describe('CurrencyService Core Functionality', () => {
     })
   })
 
-  describe('Provider Management', () => {
-    it('should switch providers', () => {
+  describe('Exchange Management', () => {
+    it('should switch exchanges', () => {
       expect(() => currency.use('google')).not.toThrow()
     })
 
-    it('should get current provider name', () => {
-      const providerName = currency.getCurrentProvider()
-      expect(providerName).toBe('google')
+    it('should get current exchange name', () => {
+      const exchangeName = currency.getCurrentExchange()
+      expect(exchangeName).toBe('google')
     })
 
-    it('should list available providers', () => {
-      const providers = currency.getAvailableProviders()
-      expect(providers).toContain('google')
+    it('should list available exchanges', () => {
+      const exchanges = currency.getAvailableExchanges()
+      expect(exchanges).toContain('google')
     })
   })
 

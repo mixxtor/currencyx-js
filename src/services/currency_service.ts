@@ -1,12 +1,12 @@
 /**
  * Currency Service
  *
- * Main service class with type-safe provider switching
+ * Main service class with type-safe exchange switching
  */
 
 import type {
   CurrencyConfig,
-  GetProviderNames,
+  GetExchangeNames,
   ConversionResult,
   ExchangeRatesResult,
   CurrencyCode,
@@ -14,9 +14,7 @@ import type {
   ExchangeRatesParams,
   CurrencyExchanges,
 } from '../types/index.js'
-import type { CurrencyExchangeContract } from '../contracts/currency_provider.js'
-
-// Removed CurrencyServiceAbstract - unnecessary abstraction with only one implementation
+import type { CurrencyExchangeContract } from '../contracts/currency_exchange.js'
 
 /**
  * Main Currency Service Implementation
@@ -24,31 +22,31 @@ import type { CurrencyExchangeContract } from '../contracts/currency_provider.js
 export class CurrencyService<
   T extends CurrencyConfig<CurrencyExchanges> = CurrencyConfig<CurrencyExchanges>,
 > {
-  #providers: Map<string, CurrencyExchangeContract> = new Map()
-  #currentProvider?: string
+  #exchanges: Map<string, CurrencyExchangeContract> = new Map()
+  #currentExchange?: string
   #config: T
 
   constructor(config: T) {
     this.#config = config
-    this.#initializeProviders()
-    this.#currentProvider = String(config.default)
+    this.#initializeExchanges()
+    this.#currentExchange = String(config.default)
   }
 
   /**
-   * Initialize providers based on configuration
-   * Handles both provider instances and factory functions
+   * Initialize exchanges based on configuration
+   * Handles both exchange instances and factory functions
    */
-  #initializeProviders(): void {
-    const providers = this.#config.providers
+  #initializeExchanges(): void {
+    const exchanges = this.#config.exchanges
 
-    for (const [name, provider] of Object.entries(providers)) {
-      // Check if provider is a factory function
-      if (typeof provider === 'function') {
-        // Call factory function to get provider instance
-        this.#providers.set(name, (provider as () => CurrencyExchangeContract)())
+    for (const [name, exchange] of Object.entries(exchanges)) {
+      // Check if exchange is a factory function
+      if (typeof exchange === 'function') {
+        // Call factory function to get exchange instance
+        this.#exchanges.set(name, (exchange as () => CurrencyExchangeContract)())
       } else {
-        // Provider is already an instance
-        this.#providers.set(name, provider)
+        // Exchange is already an instance
+        this.#exchanges.set(name, exchange)
       }
     }
   }
@@ -57,22 +55,22 @@ export class CurrencyService<
    * Convert currency amount
    */
   async convert(params: ConvertParams): Promise<ConversionResult> {
-    const provider = this.#getActiveProvider()
-    return await provider.convert(params)
+    const exchange = this.#getActiveExchange()
+    return await exchange.convert(params)
   }
 
   /**
    * Get exchange rates
    */
   async getExchangeRates(params?: ExchangeRatesParams): Promise<ExchangeRatesResult> {
-    const provider = this.#getActiveProvider()
+    const exchange = this.#getActiveExchange()
 
     // Set base currency if provided
     if (params?.base) {
-      provider.setBase(params.base)
+      exchange.setBase(params.base)
     }
 
-    return await provider.latestRates(params)
+    return await exchange.latestRates(params)
   }
 
   /**
@@ -87,53 +85,53 @@ export class CurrencyService<
   }
 
   /**
-   * Switch to a different provider (type-safe)
+   * Switch to a different exchange (type-safe)
    */
-  use<K extends keyof CurrencyExchanges>(provider: K): CurrencyExchanges[K] {
-    const providerName = String(provider)
-    if (!this.#providers.has(providerName)) {
-      throw new Error(`Provider '${providerName}' is not configured`)
+  use<K extends keyof CurrencyExchanges>(exchange: K): CurrencyExchanges[K] {
+    const exchangeName = String(exchange)
+    if (!this.#exchanges.has(exchangeName)) {
+      throw new Error(`Exchange '${exchangeName}' is not configured`)
     }
-    this.#currentProvider = providerName
-    return this.#providers.get(providerName) as CurrencyExchanges[K]
+    this.#currentExchange = exchangeName
+    return this.#exchanges.get(exchangeName) as CurrencyExchanges[K]
   }
 
   /**
-   * Get current provider name
+   * Get current exchange name
    */
-  getCurrentProvider(): GetProviderNames<T> | undefined {
-    return this.#currentProvider as GetProviderNames<T>
+  getCurrentExchange(): GetExchangeNames<T> | undefined {
+    return this.#currentExchange as GetExchangeNames<T>
   }
 
   /**
-   * Get list of available providers
+   * Get list of available exchanges
    */
-  getAvailableProviders(): GetProviderNames<T>[] {
-    return Array.from(this.#providers.keys()) as GetProviderNames<T>[]
+  getAvailableExchanges(): GetExchangeNames<T>[] {
+    return Array.from(this.#exchanges.keys()) as GetExchangeNames<T>[]
   }
 
   /**
    * Round currency value
    */
   round(value: number, precision: number = 2): number {
-    const provider = this.#getActiveProvider()
-    return provider.round(value, precision)
+    const exchange = this.#getActiveExchange()
+    return exchange.round(value, precision)
   }
 
   /**
-   * Get active provider instance
+   * Get active exchange instance
    */
-  #getActiveProvider(): CurrencyExchangeContract {
-    if (!this.#currentProvider) {
-      throw new Error('No provider is currently selected')
+  #getActiveExchange(): CurrencyExchangeContract {
+    if (!this.#currentExchange) {
+      throw new Error('No exchange is currently selected')
     }
 
-    const provider = this.#providers.get(this.#currentProvider)
-    if (!provider) {
-      throw new Error(`Provider '${this.#currentProvider}' is not available`)
+    const exchange = this.#exchanges.get(this.#currentExchange)
+    if (!exchange) {
+      throw new Error(`Exchange '${this.#currentExchange}' is not available`)
     }
 
-    return provider
+    return exchange
   }
 
   /**
@@ -152,24 +150,24 @@ export class CurrencyService<
   }
 
   /**
-   * Get supported currencies for current provider
+   * Get supported currencies for current exchange
    */
-  async getSupportedCurrencies(provider?: GetProviderNames<T>): Promise<CurrencyCode[]> {
-    const providerName = provider ? String(provider) : this.#currentProvider
-    if (!providerName) {
+  async getSupportedCurrencies(exchange?: GetExchangeNames<T>): Promise<CurrencyCode[]> {
+    const exchangeName = exchange ? String(exchange) : this.#currentExchange
+    if (!exchangeName) {
       return []
     }
 
-    const providerInstance = this.#providers.get(providerName)
-    if (!providerInstance) {
+    const exchangeInstance = this.#exchanges.get(exchangeName)
+    if (!exchangeInstance) {
       return []
     }
 
-    if ('getSupportedCurrencies' in providerInstance && typeof providerInstance.getSupportedCurrencies === 'function') {
-      return await providerInstance.getSupportedCurrencies()
+    if ('getSupportedCurrencies' in exchangeInstance && typeof exchangeInstance.getSupportedCurrencies === 'function') {
+      return await exchangeInstance.getSupportedCurrencies()
     }
 
     // Fallback to base currencies
-    return providerInstance.currencies || []
+    return exchangeInstance.currencies || []
   }
 }
