@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 
 
+## [1.0.12](https://github.com/mixxtor/currencyx-js/compare/v1.0.11...v1.0.12) (2025-07-24)
+
+### ♻️ Code Refactoring
+
+* rename providers to exchanges and update related configurations and tests ([2e97f4a](https://github.com/mixxtor/currencyx-js/commit/2e97f4a36262e7e915cd549bd876dc2c93748a9a))
+
 ## [1.0.11](https://github.com/mixxtor/currencyx-js/compare/v1.0.10...v1.0.11) (2025-07-23)
 
 ### ♻️ Code Refactoring
