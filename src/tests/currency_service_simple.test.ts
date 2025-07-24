@@ -7,7 +7,7 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import CurrencyService, { createCurrency, exchanges } from '../index.js'
 
 describe('CurrencyService Core Functionality', () => {
-  let currency: CurrencyService
+  let currency: CurrencyService<{ google: ReturnType<typeof exchanges.google> }>
 
   beforeEach(() => {
     currency = createCurrency({

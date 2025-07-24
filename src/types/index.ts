@@ -92,24 +92,14 @@ export interface FixerConfig extends BaseConfig {
 /**
  * Main currency configuration interface
  */
-export interface CurrencyConfig<T extends CurrencyExchanges = CurrencyExchanges> {
+export interface CurrencyConfig<KnownExchanges extends Record<string, CurrencyExchangeContract>> {
   /** Default provider to use for currency operations */
-  default: keyof T
+  default: keyof KnownExchanges
   /** Available currency exchanges configuration */
-  exchanges: T
+  exchanges: KnownExchanges
 }
 
 /**
  * Infer available provider names from configuration
  */
 export type InferExchanges<T> = T extends CurrencyConfig<infer P> ? keyof P : never
-
-/**
- * Provider registry for type augmentation
- */
-export interface CurrencyExchanges { [K: string]: CurrencyExchangeContract }
-
-/**
- * Helper to get provider names with fallback
- */
-export type GetExchangeNames<T extends CurrencyConfig> = keyof CurrencyExchanges extends never ? InferExchanges<T> : keyof CurrencyExchanges

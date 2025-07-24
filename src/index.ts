@@ -17,8 +17,6 @@ export type {
   FixerConfig,
   CurrencyConfig,
   InferExchanges,
-  GetExchangeNames,
-  CurrencyExchanges,
 } from './types/index.js'
 
 // Contracts
