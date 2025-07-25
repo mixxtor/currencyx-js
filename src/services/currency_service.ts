@@ -17,7 +17,7 @@ import type { CurrencyExchangeContract } from '../contracts/currency_exchange.js
 /**
  * Main Currency Service Implementation
  */
-export class CurrencyService<KnownExchanges extends Record<string, CurrencyExchangeContract>> {
+export class CurrencyService<KnownExchanges extends Record<string, CurrencyExchangeContract> = Record<string, CurrencyExchangeContract>> {
   #exchanges: Map<keyof KnownExchanges, KnownExchanges[keyof KnownExchanges]> = new Map()
   #currentExchange?: string
   #config: CurrencyConfig<KnownExchanges>
