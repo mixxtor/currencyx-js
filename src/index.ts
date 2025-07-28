@@ -16,6 +16,7 @@ export type {
   GoogleFinanceConfig,
   FixerConfig,
   CurrencyConfig,
+  CurrencyExchanges,
   InferExchanges,
 } from './types/index.js'
 

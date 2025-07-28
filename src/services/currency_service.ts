@@ -13,11 +13,12 @@ import type {
   ExchangeRatesParams,
 } from '../types/index.js'
 import type { CurrencyExchangeContract } from '../contracts/currency_exchange.js'
+import type { CurrencyExchanges } from '../types/index.js'
 
 /**
  * Main Currency Service Implementation
  */
-export class CurrencyService<KnownExchanges extends Record<string, CurrencyExchangeContract> = Record<string, CurrencyExchangeContract>> {
+export class CurrencyService<KnownExchanges extends Record<keyof CurrencyExchanges, CurrencyExchangeContract> = Record<string, CurrencyExchangeContract>> {
   #exchanges: Map<keyof KnownExchanges, KnownExchanges[keyof KnownExchanges]> = new Map()
   #currentExchange?: string
   #config: CurrencyConfig<KnownExchanges>
