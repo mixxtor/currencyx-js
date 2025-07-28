@@ -103,8 +103,8 @@ export class CurrencyService<KnownExchanges extends Record<keyof CurrencyExchang
   /**
    * Get list of available exchanges
    */
-  getAvailableExchanges() {
-    return Array.from(this.#exchanges.keys())
+  getAvailableExchanges(): (keyof KnownExchanges)[] {
+    return Array.from(this.#exchanges.keys()) as (keyof KnownExchanges)[]
   }
 
   /**
