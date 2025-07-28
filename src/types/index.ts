@@ -1,4 +1,4 @@
-import type { CurrencyExchangeContract } from '../contracts/currency_exchange'
+import type { BaseCurrencyExchange } from '../exchanges'
 
 // Currency codes based on ISO 4217
 export type CurrencyCode = string
@@ -93,12 +93,12 @@ export interface FixerConfig extends BaseConfig {
  * A list of known currency exchanges inferred from the user config
  * This interface must be extended in user-land
  */
-export interface CurrencyExchanges extends Record<string, CurrencyExchangeContract> {}
+export interface CurrencyExchanges extends Record<string, BaseCurrencyExchange> {}
 
 /**
  * Main currency configuration interface
  */
-export interface CurrencyConfig<KnownExchanges extends Record<keyof CurrencyExchanges, CurrencyExchangeContract>> {
+export interface CurrencyConfig<KnownExchanges extends Record<keyof CurrencyExchanges, BaseCurrencyExchange>> {
   /** Default provider to use for currency operations */
   default: keyof KnownExchanges
   /** Available currency exchanges configuration */

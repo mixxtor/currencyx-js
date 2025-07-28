@@ -4,7 +4,7 @@
  * Provides type-safe configuration definition similar to @adonisjs/drive
  */
 
-import type { CurrencyExchangeContract } from '../contracts/currency_exchange.js';
+import type { BaseCurrencyExchange } from '../exchanges/base_exchange.js';
 import type { CurrencyConfig } from '../types/index.js'
 
 /**
@@ -21,6 +21,6 @@ import type { CurrencyConfig } from '../types/index.js'
  * })
  * ```
  */
-export function defineConfig<KnownExchanges extends Record<string, CurrencyExchangeContract>>(config: CurrencyConfig<KnownExchanges>): CurrencyConfig<KnownExchanges> {
+export function defineConfig<KnownExchanges extends Record<string, BaseCurrencyExchange>>(config: CurrencyConfig<KnownExchanges>): CurrencyConfig<KnownExchanges> {
   return config
 }
