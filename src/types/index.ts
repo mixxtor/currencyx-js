@@ -90,9 +90,15 @@ export interface FixerConfig extends BaseConfig {
 }
 
 /**
+ * A list of known currency exchanges inferred from the user config
+ * This interface must be extended in user-land
+ */
+export interface CurrencyExchanges extends Record<string, CurrencyExchangeContract> {}
+
+/**
  * Main currency configuration interface
  */
-export interface CurrencyConfig<KnownExchanges extends Record<string, CurrencyExchangeContract>> {
+export interface CurrencyConfig<KnownExchanges extends Record<keyof CurrencyExchanges, CurrencyExchangeContract>> {
   /** Default provider to use for currency operations */
   default: keyof KnownExchanges
   /** Available currency exchanges configuration */
