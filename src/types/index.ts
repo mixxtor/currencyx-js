@@ -93,7 +93,7 @@ export interface FixerConfig extends BaseConfig {
  * A list of known currency exchanges inferred from the user config
  * This interface must be extended in user-land
  */
-export interface CurrencyExchanges extends Record<string, BaseCurrencyExchange> {}
+export interface CurrencyExchanges {}
 
 /**
  * Main currency configuration interface

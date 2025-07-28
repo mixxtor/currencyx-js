@@ -12,21 +12,20 @@ import type {
   ConvertParams,
   ExchangeRatesParams,
 } from '../types/index.js'
-import type { CurrencyExchanges } from '../types/index.js'
 import type { BaseCurrencyExchange } from '../exchanges/base_exchange.js'
 
 /**
  * Main Currency Service Implementation
  */
-export class CurrencyService<KnownExchanges extends Record<keyof CurrencyExchanges, BaseCurrencyExchange> = Record<keyof CurrencyExchanges, BaseCurrencyExchange>> {
+export class CurrencyService<KnownExchanges extends Record<string, BaseCurrencyExchange> = Record<string, BaseCurrencyExchange>> {
   #exchanges: Map<keyof KnownExchanges, KnownExchanges[keyof KnownExchanges]> = new Map()
-  #currentExchange?: string
+  #currentExchange?: keyof KnownExchanges
   #config: CurrencyConfig<KnownExchanges>
 
   constructor(config: CurrencyConfig<KnownExchanges>) {
     this.#config = config
     this.#initializeExchanges()
-    this.#currentExchange = String(config.default)
+    this.#currentExchange = config.default
   }
 
   /**
@@ -40,10 +39,10 @@ export class CurrencyService<KnownExchanges extends Record<keyof CurrencyExchang
       // Check if exchange is a factory function
       if (typeof exchange === 'function') {
         // Call factory function to get exchange instance
-        this.#exchanges.set(name, (exchange as () => KnownExchanges[keyof KnownExchanges])())
+        this.#exchanges.set(name as keyof KnownExchanges, (exchange as () => KnownExchanges[keyof KnownExchanges])())
       } else {
         // Exchange is already an instance
-        this.#exchanges.set(name, exchange as KnownExchanges[keyof KnownExchanges])
+        this.#exchanges.set(name as keyof KnownExchanges, exchange as KnownExchanges[keyof KnownExchanges])
       }
     }
   }
@@ -85,12 +84,12 @@ export class CurrencyService<KnownExchanges extends Record<keyof CurrencyExchang
    * Switch to a different exchange (type-safe)
    */
   use<ExchangeName extends keyof KnownExchanges>(exchange: ExchangeName): KnownExchanges[ExchangeName] {
-    const exchangeName = String(exchange)
-    if (!this.#exchanges.has(exchangeName)) {
-      throw new Error(`Exchange '${exchangeName}' is not configured`)
+    const exchangeName = exchange
+    if (!this.#exchanges.has(exchangeName as keyof KnownExchanges)) {
+      throw new Error(`Exchange '${exchangeName?.toString()}' is not configured`)
     }
     this.#currentExchange = exchangeName
-    return this.#exchanges.get(exchangeName) as KnownExchanges[ExchangeName]
+    return this.#exchanges.get(exchangeName as keyof KnownExchanges) as KnownExchanges[ExchangeName]
   }
 
   /**
@@ -118,14 +117,14 @@ export class CurrencyService<KnownExchanges extends Record<keyof CurrencyExchang
   /**
    * Get active exchange instance
    */
-  #getActiveExchange(): BaseCurrencyExchange {
+  #getActiveExchange(): KnownExchanges[keyof KnownExchanges] {
     if (!this.#currentExchange) {
       throw new Error('No exchange is currently selected')
     }
 
     const exchange = this.#exchanges.get(this.#currentExchange)
     if (!exchange) {
-      throw new Error(`Exchange '${this.#currentExchange}' is not available`)
+      throw new Error(`Exchange '${this.#currentExchange?.toString()}' is not available`)
     }
 
     return exchange
@@ -150,12 +149,12 @@ export class CurrencyService<KnownExchanges extends Record<keyof CurrencyExchang
    * Get supported currencies for current exchange
    */
   async getSupportedCurrencies(exchange?: keyof KnownExchanges): Promise<CurrencyCode[]> {
-    const exchangeName = exchange ? String(exchange) : this.#currentExchange
+    const exchangeName = exchange ? exchange : this.#currentExchange
     if (!exchangeName) {
       return []
     }
 
-    const exchangeInstance = this.#exchanges.get(exchangeName)
+    const exchangeInstance = this.#exchanges.get(exchangeName) as BaseCurrencyExchange
     if (!exchangeInstance) {
       return []
     }
