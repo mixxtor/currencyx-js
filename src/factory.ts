@@ -6,7 +6,7 @@
 
 import type { CurrencyConfig, CurrencyExchanges } from './types/index.js'
 import { CurrencyService } from './services/index.js'
-import type { CurrencyExchangeContract } from './contracts/currency_exchange.js'
+import type { BaseCurrencyExchange } from './exchanges/base_exchange.js'
 
 /**
  * Create a typed currency service with exchange inference
@@ -29,7 +29,7 @@ import type { CurrencyExchangeContract } from './contracts/currency_exchange.js'
  * // currency.use('invalid') // ❌ TypeScript error
  * ```
  */
-export function createCurrency<KnownExchanges extends Record<keyof CurrencyExchanges, CurrencyExchangeContract>>(
+export function createCurrency<KnownExchanges extends Record<keyof CurrencyExchanges, BaseCurrencyExchange>>(
   config: CurrencyConfig<KnownExchanges>
 ): CurrencyService<KnownExchanges> {
   return new CurrencyService<KnownExchanges>(config)

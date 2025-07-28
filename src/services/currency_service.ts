@@ -12,13 +12,13 @@ import type {
   ConvertParams,
   ExchangeRatesParams,
 } from '../types/index.js'
-import type { CurrencyExchangeContract } from '../contracts/currency_exchange.js'
 import type { CurrencyExchanges } from '../types/index.js'
+import type { BaseCurrencyExchange } from '../exchanges/base_exchange.js'
 
 /**
  * Main Currency Service Implementation
  */
-export class CurrencyService<KnownExchanges extends Record<keyof CurrencyExchanges, CurrencyExchangeContract> = Record<string, CurrencyExchangeContract>> {
+export class CurrencyService<KnownExchanges extends Record<keyof CurrencyExchanges, BaseCurrencyExchange> = Record<string, BaseCurrencyExchange>> {
   #exchanges: Map<keyof KnownExchanges, KnownExchanges[keyof KnownExchanges]> = new Map()
   #currentExchange?: string
   #config: CurrencyConfig<KnownExchanges>
@@ -118,7 +118,7 @@ export class CurrencyService<KnownExchanges extends Record<keyof CurrencyExchang
   /**
    * Get active exchange instance
    */
-  #getActiveExchange(): CurrencyExchangeContract {
+  #getActiveExchange(): BaseCurrencyExchange {
     if (!this.#currentExchange) {
       throw new Error('No exchange is currently selected')
     }
