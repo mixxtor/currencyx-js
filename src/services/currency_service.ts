@@ -5,27 +5,28 @@ import type {
   CurrencyCode,
   ConvertParams,
   ExchangeRatesParams,
-  CurrencyInfo,
 } from '../types/index.js'
-import type { BaseCurrencyExchange } from '../exchanges/base_exchange.js'
-import type { CurrencyExchangeContract } from '../contracts/currency_exchange.js'
+import { BaseCurrencyExchange } from '../exchanges/base_exchange.js'
 
 /**
  * Main Currency Service Implementation
  */
-export class CurrencyService<KnownExchanges extends Record<string, BaseCurrencyExchange> = Record<string, BaseCurrencyExchange>> implements CurrencyExchangeContract {
+export class CurrencyService<KnownExchanges extends Record<string, BaseCurrencyExchange> = Record<string, BaseCurrencyExchange>> extends BaseCurrencyExchange {
   #exchanges: Map<keyof KnownExchanges, KnownExchanges[keyof KnownExchanges]> = new Map()
   #currentExchangeName: keyof KnownExchanges
   #config: CurrencyConfig<KnownExchanges>
   base: CurrencyCode
+  name: string = null as unknown as string
 
   constructor(config: CurrencyConfig<KnownExchanges>) {
+    super()
     this.#config = config
     this.#initializeExchanges()
     this.#currentExchangeName = config.default
 
     const exchange = this.#exchanges.get(this.#currentExchangeName)
     this.base = exchange?.base || 'USD'
+    this.name = exchange?.name || null as unknown as string
   }
 
   /**
@@ -47,7 +48,7 @@ export class CurrencyService<KnownExchanges extends Record<string, BaseCurrencyE
     }
   }
 
-  getList(): CurrencyInfo[] {
+  getList() {
     const exchange = this.#getActiveExchange()
     return exchange.getList()
   }
