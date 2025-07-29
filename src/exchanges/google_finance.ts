@@ -29,7 +29,7 @@ export class GoogleFinanceExchange extends BaseCurrencyExchange {
    */
   async latestRates(params?: ExchangeRatesParams): Promise<ExchangeRatesResult> {
     const rates: Record<string, number> = {}
-    const currenciesToFetch = params?.symbols || this.currencies
+    const currenciesToFetch = params?.code || this.currencies
 
     try {
       for (const code of currenciesToFetch) {

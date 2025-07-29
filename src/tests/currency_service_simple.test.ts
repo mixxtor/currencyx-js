@@ -44,7 +44,7 @@ describe('CurrencyService Core Functionality', () => {
 
   describe('Exchange Rates', () => {
     it('should get exchange rates with object parameters', async () => {
-      const result = await currency.getExchangeRates({ base: 'USD', symbols: ['USD'] })
+      const result = await currency.getExchangeRates({ base: 'USD', code: ['USD'] })
 
       expect(result.success).toBe(true)
       expect(result.base).toBe('USD')

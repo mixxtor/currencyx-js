@@ -11,4 +11,5 @@ node_modules
 *.log
 yarn.lock
 shrinkwrap.yaml
+.npmrc
 # package-lock.json

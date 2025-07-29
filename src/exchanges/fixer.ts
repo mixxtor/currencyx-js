@@ -71,7 +71,7 @@ export class FixerExchange extends BaseCurrencyExchange {
    * Get latest exchange rates
    */
   async latestRates(params?: ExchangeRatesParams): Promise<ExchangeRatesResult> {
-    const symbols = params?.symbols
+    const symbols = params?.code
     try {
       const url = new URL(`${this.baseUrl}/latest`)
       url.searchParams.set('access_key', this.accessKey)
@@ -170,18 +170,18 @@ export class FixerExchange extends BaseCurrencyExchange {
 
       // If one of the currencies is the base currency, we can use latest rates
       if (from === this.base) {
-        const rates = await this.latestRates({ symbols: [to] })
+        const rates = await this.latestRates({ code: [to] })
         return rates.rates[to]
       }
 
       if (to === this.base) {
-        const rates = await this.latestRates({ symbols: [from] })
+        const rates = await this.latestRates({ code: [from] })
         const rate = rates.rates[from]
         return rate ? 1 / rate : undefined
       }
 
       // For cross-currency conversion, get both rates against base
-      const rates = await this.latestRates({ symbols: [from, to] })
+      const rates = await this.latestRates({ code: [from, to] })
       const fromRate = rates.rates[from]
       const toRate = rates.rates[to]
 

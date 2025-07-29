@@ -31,7 +31,7 @@ describe('Exchange Core Functionality', () => {
     })
 
     it('should get same currency exchange rate', async () => {
-      const result = await exchange.latestRates({ base: 'USD', symbols: ['USD'] })
+      const result = await exchange.latestRates({ base: 'USD', code: ['USD'] })
       expect(result.success).toBe(true)
       expect(result.rates).toHaveProperty('USD')
       expect(result.rates.USD).toBe(1)

@@ -1,12 +1,13 @@
 import type { BaseCurrencyExchange } from '../exchanges'
 
 // Currency codes based on ISO 4217
-export type CurrencyCode = string
+import type { CountryCode, CurrencyCode, CurrencyInfo } from '../data/currencies'
+export type { CountryCode, CurrencyCode, CurrencyInfo }
 
 /**
  * Parameters for currency conversion
  */
-export interface ConvertParams {
+export type ConvertParams = {
   amount: number
   from: CurrencyCode
   to: CurrencyCode
@@ -17,7 +18,7 @@ export interface ConvertParams {
  */
 export interface ExchangeRatesParams {
   base?: CurrencyCode
-  symbols?: CurrencyCode[]
+  code?: CurrencyCode[]
 }
 
 /**
@@ -36,11 +37,7 @@ export interface BaseResult {
  * Currency conversion result
  */
 export interface ConversionResult extends BaseResult {
-  query: {
-    from: CurrencyCode
-    to: CurrencyCode
-    amount: number
-  }
+  query: ConvertParams
   info: {
     timestamp: number
     rate?: number
@@ -56,23 +53,7 @@ export interface ExchangeRatesResult extends BaseResult {
   timestamp: number
   date: string
   base: CurrencyCode
-  rates: Record<string, number>
-}
-
-/**
- * Currency information from the currency list
- */
-export interface CurrencyInfo {
-  code: CurrencyCode
-  numeric_code: string
-  name: string
-  symbol: string
-  round: number
-  decimal: number
-  delimiter: string
-  short_format: string
-  explicit_format: string
-  countries: string[]
+  rates: Record<CurrencyCode, number>
 }
 
 /**
@@ -93,7 +74,7 @@ export interface FixerConfig extends BaseConfig {
  * A list of known currency exchanges inferred from the user config
  * This interface must be extended in user-land
  */
-export interface CurrencyExchanges {}
+export interface CurrencyExchanges { }
 
 /**
  * Main currency configuration interface

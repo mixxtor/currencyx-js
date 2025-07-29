@@ -11,9 +11,10 @@ import type {
   ConvertParams,
   ExchangeRatesParams,
   CurrencyInfo,
+  CountryCode,
 } from '../types/index.js'
 import type { CurrencyExchangeContract } from '../contracts/currency_exchange.js'
-import { getCurrencyList } from '../data/currencies.js'
+import { getList } from '../data/currencies.js'
 
 export abstract class BaseCurrencyExchange implements CurrencyExchangeContract {
   /**
@@ -30,19 +31,20 @@ export abstract class BaseCurrencyExchange implements CurrencyExchangeContract {
    * Get all supported currencies
    */
   public get currencies() {
-    return getCurrencyList().map(c => c.code)
+    return getList().map(c => c.code)
   }
 
   /**
    * Get all currencies
    */
   getList() {
-    return getCurrencyList()
+    return getList()
   }
 
   /**
    * Filter currencies by name
    */
+  filterByName(name: CurrencyInfo['name']): CurrencyInfo[]
   filterByName(name: string) {
     return this.getList().filter((c) => c.name.includes(name))
   }
@@ -50,27 +52,30 @@ export abstract class BaseCurrencyExchange implements CurrencyExchangeContract {
   /**
    * Filter currencies by country
    */
-  filterByCountry(iso2: string) {
-    return this.getList().filter((c) => c.countries.includes(iso2))
+  filterByCountry(iso2: CountryCode) {
+    return this.getList().filter(c => c.countries.find(c => c === iso2.toUpperCase()))
   }
 
   /**
    * Get currency info by country ISO2 code (e.g., 'US')
    */
+  getByCountry(iso2: CountryCode): CurrencyInfo | undefined
   getByCountry(iso2: string) {
-    return this.getList().find((c) => c.countries.includes(iso2))
+    return this.getList().find((c) => c.countries.find(c => c === iso2.toUpperCase()))
   }
 
   /**
    * Get currency info by ISO code (e.g., 'USD')
    */
-  getByCode(code: CurrencyCode) {
+  getByCode(code: CurrencyCode): CurrencyInfo | undefined
+  getByCode(code: string) {
     return this.getList().find((c) => c.code === code)
   }
 
   /**
    * Get currency info by symbol (e.g., '$')
    */
+  getBySymbol(symbol: CurrencyInfo['symbol']): CurrencyInfo | undefined
   getBySymbol(symbol: string) {
     return this.getList().find((c) => c.symbol === symbol)
   }
@@ -78,22 +83,41 @@ export abstract class BaseCurrencyExchange implements CurrencyExchangeContract {
   /**
    * Get currency info by numeric code (e.g., '840')
    */
+  getByNumericCode(numCode: CurrencyInfo['numeric_code']): CurrencyInfo | undefined
   getByNumericCode(numCode: string) {
     return this.getList().find((c) => c.numeric_code === numCode)
   }
 
   /**
-   * Abstract methods that must be implemented by subclasses
+   * Abstract method that retrieves the latest currency conversion rates.
+   *
+   * @param symbols - The currency codes to retrieve rates for.
    */
   abstract latestRates(params?: ExchangeRatesParams): Promise<ExchangeRatesResult>
+
+  /**
+   * Abstract method that retrieves the currency conversion rate.
+   *
+   * @param amount - The amount to convert.
+   * @param from - The currency code to convert from.
+   * @param to - The currency code to convert to. Defaults to 'USD'.
+   */
   abstract convert(params: ConvertParams): Promise<ConversionResult>
+
+  /**
+   * Abstract method that retrieves the currency conversion rate.
+   *
+   * @param from - The currency code to convert from.
+   * @param to - The currency code to convert to. Defaults to 'USD'.
+   */
   abstract getConvertRate(from: CurrencyCode, to: CurrencyCode, currencyList?: CurrencyInfo[]): Promise<number | undefined>
 
   /**
    * Set base currency
    */
+  setBase(currency: string): this
   setBase(currency: CurrencyCode): this {
-    this.base = currency
+    this.base = currency || 'USD'
     return this
   }
 

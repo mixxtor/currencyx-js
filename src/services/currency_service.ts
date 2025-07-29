@@ -76,8 +76,8 @@ export class CurrencyService<KnownExchanges extends Record<string, BaseCurrencyE
     return this.convert({ amount, from, to })
   }
 
-  async getRates(base?: CurrencyCode, symbols?: CurrencyCode[]): Promise<ExchangeRatesResult> {
-    return this.getExchangeRates({ base, symbols })
+  async getRates(base?: CurrencyCode, code?: CurrencyCode[]): Promise<ExchangeRatesResult> {
+    return this.getExchangeRates({ base, code })
   }
 
   /**
