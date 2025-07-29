@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 
 
+## [1.1.3](https://github.com/mixxtor/currencyx-js/compare/v1.1.1...v1.1.3) (2025-07-29)
+
+### ♻️ Code Refactoring
+
+* currency list & types ([919e143](https://github.com/mixxtor/currencyx-js/commit/919e143bb15ad25a09de42b663fa2991601c65ee))
+
 ## [1.1.1](https://github.com/mixxtor/currencyx-js/compare/v1.1.0...v1.1.1) (2025-07-28)
 
 ## [1.1.0](https://github.com/mixxtor/currencyx-js/compare/v1.0.20...v1.1.0) (2025-07-28)
