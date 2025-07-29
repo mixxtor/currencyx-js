@@ -211,14 +211,14 @@ export const CURRENCIES = [
 /**
  * Get all currencies
  */
-export function getList() {
-  return CURRENCIES
+export function getList(): CurrencyInfo[] {
+  return CURRENCIES as unknown as CurrencyInfo[]
 }
 
 /**
  * Filter currencies by country
  */
-export function filterByCountry(iso2: CountryCode) {
+export function filterByCountry(iso2: CountryCode): CurrencyInfo[] {
   return CURRENCIES.filter(c => c.countries.find(c => c === iso2.toUpperCase()))
 }
 

@@ -29,7 +29,7 @@ export class GoogleFinanceExchange extends BaseCurrencyExchange {
    */
   async latestRates(params?: ExchangeRatesParams): Promise<ExchangeRatesResult> {
     const rates: Record<string, number> = {}
-    const currenciesToFetch = params?.code || this.currencies
+    const currenciesToFetch = params?.codes || this.currencies
 
     try {
       for (const code of currenciesToFetch) {
@@ -38,7 +38,7 @@ export class GoogleFinanceExchange extends BaseCurrencyExchange {
           continue
         }
 
-        const rate = await this.getRate(this.base, code)
+        const rate = await this.#getRate(this.base, code)
         if (rate) {
           rates[code] = rate
         }
@@ -67,7 +67,7 @@ export class GoogleFinanceExchange extends BaseCurrencyExchange {
         return this.createConversionResult(amount, from, to, amount, 1.0)
       }
 
-      const rate = await this.getRate(from, to)
+      const rate = await this.#getRate(from, to)
       if (!rate) {
         return this.createConversionResult(amount, from, to, undefined, undefined, {
           info: `Failed to get exchange rate for ${from}-${to}`,
@@ -89,13 +89,13 @@ export class GoogleFinanceExchange extends BaseCurrencyExchange {
    * Get conversion rate between two currencies
    */
   async getConvertRate(from: CurrencyCode, to: CurrencyCode): Promise<number | undefined> {
-    return await this.getRate(from, to)
+    return await this.#getRate(from, to)
   }
 
   /**
    * Get exchange rate from Google Finance
    */
-  private async getRate(from: CurrencyCode, to: CurrencyCode): Promise<number | undefined> {
+  async #getRate(from: CurrencyCode, to: CurrencyCode): Promise<number | undefined> {
     try {
       const url = `${this.baseUrl}/quote/${from}-${to}`
       const userAgent =
@@ -113,7 +113,7 @@ export class GoogleFinanceExchange extends BaseCurrencyExchange {
       const html = await response.text()
 
       // Parse HTML to extract rate using regex (since we can't use cheerio in browser)
-      const rate = this.parseRateFromHtml(html, from, to)
+      const rate = this.#parseRateFromHtml(html, from, to)
 
       if (rate && !isNaN(rate)) {
         return rate
@@ -129,7 +129,7 @@ export class GoogleFinanceExchange extends BaseCurrencyExchange {
   /**
    * Parse exchange rate from Google Finance HTML
    */
-  private parseRateFromHtml(html: string, from: CurrencyCode, to: CurrencyCode): number | undefined {
+  #parseRateFromHtml(html: string, from: CurrencyCode, to: CurrencyCode): number | undefined {
     try {
       // Look for the rate in various possible formats
       const patterns = [

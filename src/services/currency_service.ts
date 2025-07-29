@@ -1,9 +1,3 @@
-/**
- * Currency Service
- *
- * Main service class with type-safe exchange switching
- */
-
 import type {
   CurrencyConfig,
   ConversionResult,
@@ -11,21 +5,27 @@ import type {
   CurrencyCode,
   ConvertParams,
   ExchangeRatesParams,
+  CurrencyInfo,
 } from '../types/index.js'
 import type { BaseCurrencyExchange } from '../exchanges/base_exchange.js'
+import type { CurrencyExchangeContract } from '../contracts/currency_exchange.js'
 
 /**
  * Main Currency Service Implementation
  */
-export class CurrencyService<KnownExchanges extends Record<string, BaseCurrencyExchange> = Record<string, BaseCurrencyExchange>> {
+export class CurrencyService<KnownExchanges extends Record<string, BaseCurrencyExchange> = Record<string, BaseCurrencyExchange>> implements CurrencyExchangeContract {
   #exchanges: Map<keyof KnownExchanges, KnownExchanges[keyof KnownExchanges]> = new Map()
-  #currentExchange?: keyof KnownExchanges
+  #currentExchangeName: keyof KnownExchanges
   #config: CurrencyConfig<KnownExchanges>
+  base: CurrencyCode
 
   constructor(config: CurrencyConfig<KnownExchanges>) {
     this.#config = config
     this.#initializeExchanges()
-    this.#currentExchange = config.default
+    this.#currentExchangeName = config.default
+
+    const exchange = this.#exchanges.get(this.#currentExchangeName)
+    this.base = exchange?.base || 'USD'
   }
 
   /**
@@ -45,6 +45,11 @@ export class CurrencyService<KnownExchanges extends Record<string, BaseCurrencyE
         this.#exchanges.set(name as keyof KnownExchanges, exchange as KnownExchanges[keyof KnownExchanges])
       }
     }
+  }
+
+  getList(): CurrencyInfo[] {
+    const exchange = this.#getActiveExchange()
+    return exchange.getList()
   }
 
   /**
@@ -69,15 +74,12 @@ export class CurrencyService<KnownExchanges extends Record<string, BaseCurrencyE
     return await exchange.latestRates(params)
   }
 
-  /**
-   * Convenience methods for backward compatibility
-   */
-  async convertAmount(amount: number, from: CurrencyCode, to: CurrencyCode): Promise<ConversionResult> {
-    return this.convert({ amount, from, to })
+  async latestRates(params?: ExchangeRatesParams): Promise<ExchangeRatesResult> {
+    return this.getExchangeRates(params)
   }
 
-  async getRates(base?: CurrencyCode, code?: CurrencyCode[]): Promise<ExchangeRatesResult> {
-    return this.getExchangeRates({ base, code })
+  async getConvertRate(from: CurrencyCode, to: CurrencyCode): Promise<number | undefined> {
+    return this.#getActiveExchange().getConvertRate(from, to)
   }
 
   /**
@@ -88,7 +90,7 @@ export class CurrencyService<KnownExchanges extends Record<string, BaseCurrencyE
     if (!this.#exchanges.has(exchangeName as keyof KnownExchanges)) {
       throw new Error(`Exchange '${exchangeName?.toString()}' is not configured`)
     }
-    this.#currentExchange = exchangeName
+    this.#currentExchangeName = exchangeName
     return this.#exchanges.get(exchangeName as keyof KnownExchanges) as KnownExchanges[ExchangeName]
   }
 
@@ -96,7 +98,7 @@ export class CurrencyService<KnownExchanges extends Record<string, BaseCurrencyE
    * Get current exchange name
    */
   getCurrentExchange() {
-    return this.#currentExchange
+    return this.#currentExchangeName
   }
 
   /**
@@ -118,13 +120,13 @@ export class CurrencyService<KnownExchanges extends Record<string, BaseCurrencyE
    * Get active exchange instance
    */
   #getActiveExchange(): KnownExchanges[keyof KnownExchanges] {
-    if (!this.#currentExchange) {
+    if (!this.#currentExchangeName) {
       throw new Error('No exchange is currently selected')
     }
 
-    const exchange = this.#exchanges.get(this.#currentExchange)
+    const exchange = this.#exchanges.get(this.#currentExchangeName)
     if (!exchange) {
-      throw new Error(`Exchange '${this.#currentExchange?.toString()}' is not available`)
+      throw new Error(`Exchange '${this.#currentExchangeName?.toString()}' is not available`)
     }
 
     return exchange
@@ -132,8 +134,13 @@ export class CurrencyService<KnownExchanges extends Record<string, BaseCurrencyE
 
   /**
    * Format currency value with proper locale
+   *
+   * @param {number} params.amount - Currency amount
+   * @param {CurrencyCode} params.code - Currency code
+   * @param {string} params.locale - Locale to use for formatting
    */
-  formatCurrency(amount: number, currencyCode: CurrencyCode, locale: string = 'en-US'): string {
+  formatCurrency(params: { amount: number, code: CurrencyCode, locale?: string }): string {
+    const { amount, code: currencyCode, locale = 'en-US' } = params
     try {
       return new Intl.NumberFormat(locale, {
         style: 'currency',
@@ -148,8 +155,7 @@ export class CurrencyService<KnownExchanges extends Record<string, BaseCurrencyE
   /**
    * Get supported currencies for current exchange
    */
-  async getSupportedCurrencies(exchange?: keyof KnownExchanges): Promise<CurrencyCode[]> {
-    const exchangeName = exchange ? exchange : this.#currentExchange
+  async getSupportedCurrencies(exchangeName: keyof KnownExchanges = this.#currentExchangeName): Promise<CurrencyCode[]> {
     if (!exchangeName) {
       return []
     }

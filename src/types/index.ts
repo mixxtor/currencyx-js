@@ -18,7 +18,7 @@ export type ConvertParams = {
  */
 export interface ExchangeRatesParams {
   base?: CurrencyCode
-  code?: CurrencyCode[]
+  codes?: CurrencyCode[]
 }
 
 /**

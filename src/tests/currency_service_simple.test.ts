@@ -31,7 +31,7 @@ describe('CurrencyService Core Functionality', () => {
     })
 
     it('should convert same currency with convenience method', async () => {
-      const result = await currency.convertAmount(100, 'EUR', 'EUR')
+      const result = await currency.convert({ amount: 100, from: 'EUR', to: 'EUR' })
 
       expect(result.success).toBe(true)
       expect(result.query.amount).toBe(100)
@@ -44,7 +44,7 @@ describe('CurrencyService Core Functionality', () => {
 
   describe('Exchange Rates', () => {
     it('should get exchange rates with object parameters', async () => {
-      const result = await currency.getExchangeRates({ base: 'USD', code: ['USD'] })
+      const result = await currency.getExchangeRates({ base: 'USD', codes: ['USD'] })
 
       expect(result.success).toBe(true)
       expect(result.base).toBe('USD')
@@ -53,7 +53,7 @@ describe('CurrencyService Core Functionality', () => {
     })
 
     it('should get exchange rates with convenience method', async () => {
-      const result = await currency.getRates('EUR', ['EUR'])
+      const result = await currency.latestRates({ base: 'EUR', codes: ['EUR'] })
 
       expect(result.success).toBe(true)
       expect(result.base).toBe('EUR')
@@ -80,7 +80,7 @@ describe('CurrencyService Core Functionality', () => {
 
   describe('Utility Methods', () => {
     it('should format currency', () => {
-      const formatted = currency.formatCurrency(1234.56, 'USD')
+      const formatted = currency.formatCurrency({ amount: 1234.56, code: 'USD' })
       expect(typeof formatted).toBe('string')
       expect(formatted).toContain('1,234.56')
     })

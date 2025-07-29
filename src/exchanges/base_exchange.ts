@@ -1,9 +1,3 @@
-/**
- * Base Currency Exchange
- *
- * Simplified abstract base class for all currency exchanges
- */
-
 import type {
   CurrencyCode,
   ConversionResult,
@@ -28,7 +22,7 @@ export abstract class BaseCurrencyExchange implements CurrencyExchangeContract {
   public base: CurrencyCode = 'USD'
 
   /**
-   * Get all supported currencies
+   * Get all supported currency codes
    */
   public get currencies() {
     return getList().map(c => c.code)
@@ -58,6 +52,8 @@ export abstract class BaseCurrencyExchange implements CurrencyExchangeContract {
 
   /**
    * Get currency info by country ISO2 code (e.g., 'US')
+   *
+   * @param {string} iso2
    */
   getByCountry(iso2: CountryCode): CurrencyInfo | undefined
   getByCountry(iso2: string) {
@@ -66,14 +62,17 @@ export abstract class BaseCurrencyExchange implements CurrencyExchangeContract {
 
   /**
    * Get currency info by ISO code (e.g., 'USD')
+   *
+   * @param {string} code
    */
-  getByCode(code: CurrencyCode): CurrencyInfo | undefined
-  getByCode(code: string) {
+  getByCode(code: CurrencyCode): CurrencyInfo | undefined {
     return this.getList().find((c) => c.code === code)
   }
 
   /**
    * Get currency info by symbol (e.g., '$')
+   *
+   * @param {string} symbol
    */
   getBySymbol(symbol: CurrencyInfo['symbol']): CurrencyInfo | undefined
   getBySymbol(symbol: string) {
@@ -82,6 +81,8 @@ export abstract class BaseCurrencyExchange implements CurrencyExchangeContract {
 
   /**
    * Get currency info by numeric code (e.g., '840')
+   *
+   * @param {string} numCode
    */
   getByNumericCode(numCode: CurrencyInfo['numeric_code']): CurrencyInfo | undefined
   getByNumericCode(numCode: string) {
@@ -91,31 +92,34 @@ export abstract class BaseCurrencyExchange implements CurrencyExchangeContract {
   /**
    * Abstract method that retrieves the latest currency conversion rates.
    *
-   * @param symbols - The currency codes to retrieve rates for.
+   * @param {ExchangeRatesParams} params - The parameters for getting exchange rates.
+   * @param {CurrencyCode} params.base - The base currency code to retrieve rates for.
+   * @param {CurrencyCode[]} params.codes - The currency codes to retrieve rates for.
    */
   abstract latestRates(params?: ExchangeRatesParams): Promise<ExchangeRatesResult>
 
   /**
    * Abstract method that retrieves the currency conversion rate.
    *
-   * @param amount - The amount to convert.
-   * @param from - The currency code to convert from.
-   * @param to - The currency code to convert to. Defaults to 'USD'.
+   * @param {ConvertParams} params - The parameters for converting currency.
+   * @param {number} params.amount - The amount to convert.
+   * @param {CurrencyCode} params.from - The currency code to convert from.
+   * @param {CurrencyCode} params.to - The currency code to convert to. Defaults to 'USD'.
    */
   abstract convert(params: ConvertParams): Promise<ConversionResult>
 
   /**
    * Abstract method that retrieves the currency conversion rate.
    *
-   * @param from - The currency code to convert from.
-   * @param to - The currency code to convert to. Defaults to 'USD'.
+   * @param {CurrencyCode} from - The currency code to convert from.
+   * @param {CurrencyCode} to - The currency code to convert to. Defaults to 'USD'.
+   * @param {CurrencyInfo[]} currencyList - List of currencies
    */
   abstract getConvertRate(from: CurrencyCode, to: CurrencyCode, currencyList?: CurrencyInfo[]): Promise<number | undefined>
 
   /**
    * Set base currency
    */
-  setBase(currency: string): this
   setBase(currency: CurrencyCode): this {
     this.base = currency || 'USD'
     return this

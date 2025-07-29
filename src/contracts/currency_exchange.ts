@@ -4,17 +4,13 @@ import type {
   ExchangeRatesParams,
   ExchangeRatesResult,
   ConvertParams,
+  CurrencyInfo,
 } from '../types/index.js'
 
 /**
  * Main contract that all currency exchanges must implement
  */
 export interface CurrencyExchangeContract {
-  /**
-   * Exchange name for identification
-   */
-  readonly name: string
-
   /**
    * Base currency code. Default is 'USD'.
    */
@@ -23,30 +19,42 @@ export interface CurrencyExchangeContract {
   /**
    * Get supported currencies
    */
-  currencies: CurrencyCode[]
+  getList(): CurrencyInfo[]
 
   /**
    * Set base currency
    */
-  setBase(currency: CurrencyCode): this
+  setBase?(currency: CurrencyCode): this
 
   /**
    * Set API key (if required by exchange)
    */
-  setKey(key: string): this
+  setKey?(key: string): this
 
   /**
-   * Get latest exchange rates
+   * Retrieves the latest currency conversion rates.
+   *
+   * @param {ExchangeRatesParams} params - The parameters for getting exchange rates.
+   * @param {CurrencyCode} params.base - The base currency code to retrieve rates for.
+   * @param {CurrencyCode[]} params.codes - The currency codes to retrieve rates for.
    */
   latestRates(params?: ExchangeRatesParams): Promise<ExchangeRatesResult>
 
   /**
-   * Convert currency amount
+   * Retrieves the currency conversion rate.
+   *
+   * @param {ConvertParams} params - The parameters for converting currency.
+   * @param {number} params.amount - The amount to convert.
+   * @param {CurrencyCode} params.from - The currency code to convert from.
+   * @param {CurrencyCode} params.to - The currency code to convert to. Defaults to 'USD'.
    */
   convert(params: ConvertParams): Promise<ConversionResult>
 
   /**
-   * Get conversion rate between two currencies
+   * Retrieves the currency conversion rate.
+   *
+   * @param {CurrencyCode} from - The currency code to convert from.
+   * @param {CurrencyCode} to - The currency code to convert to. Defaults to 'USD'.
    */
   getConvertRate(from: CurrencyCode, to: CurrencyCode, currencyList?: Record<string, any>[]): Promise<number | undefined>
 
