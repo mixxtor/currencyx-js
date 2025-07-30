@@ -1,6 +1,6 @@
 # CurrencyX.js
 
-> Modern TypeScript currency converter with type inference and multiple providers. Framework agnostic with clean architecture.
+> Modern TypeScript currency converter with type inference and multiple exchanges. Framework agnostic with clean architecture.
 
 [![npm version](https://badge.fury.io/js/@mixxtor%2Fcurrencyx-js.svg)](https://badge.fury.io/js/@mixxtor%2Fcurrencyx-js)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
@@ -9,11 +9,11 @@
 ## ✨ Features
 
 - 🚀 **Modern TypeScript** - Full type safety with intelligent inference
-- 🔄 **Multiple Providers** - Google Finance, Fixer.io, and extensible architecture  
+- 🔄 **Multiple Exchanges** - Google Finance, Fixer.io, and extensible architecture  
 - 🎯 **Type Inference** - Smart provider and configuration type inference
 - 🧩 **Framework Agnostic** - Works with any JavaScript/TypeScript project
 - 📦 **Zero Dependencies** - Lightweight and fast
-- 🔧 **Extensible** - Easy to add custom providers
+- 🔧 **Extensible** - Easy to add custom exchanges
 - 🌐 **Clean APIs** - Intuitive object-based and positional parameter APIs
 - ⚡ **High Performance** - Optimized for speed and memory efficiency
 
@@ -28,10 +28,10 @@ npm install @mixxtor/currencyx-js
 ```typescript
 import { createCurrency, exchanges } from '@mixxtor/currencyx-js'
 
-// Create currency service with multiple providers
+// Create currency service with multiple exchanges
 const currency = createCurrency({
   default: 'google',
-  providers: {
+  exchanges: {
     google: exchanges.google({ base: 'USD' }),
     fixer: exchanges.fixer({ accessKey: 'your-api-key' }),
   },
@@ -81,7 +81,7 @@ Get exchange rates with object parameters:
 ```typescript
 const rates = await currency.getExchangeRates({
   base: 'USD',
-  symbols: ['EUR', 'GBP', 'JPY'],
+  codes: ['EUR', 'GBP', 'JPY'],
 })
 
 // Result structure  
@@ -97,31 +97,24 @@ interface ExchangeRatesResult {
 
 ### Convenience Methods (Positional Parameters)
 
-#### `convertAmount(amount, from, to)`
-Shorthand for simple conversions:
-
-```typescript
-const result = await currency.convertAmount(100, 'USD', 'EUR')
-```
-
-#### `getRates(base, symbols)`
+#### `latestRates({ base, codes })`
 Shorthand for getting rates:
 
 ```typescript
-const rates = await currency.getRates('USD', ['EUR', 'GBP'])
+const rates = await currency.latestRates({ base: 'USD', codes: ['EUR', 'GBP'] })
 ```
 
 ### Provider Management
 
 ```typescript
-// Switch providers
+// Switch exchanges
 currency.use('fixer')
 
 // Get current provider
 const current = currency.getCurrentProvider() // 'fixer'
 
-// List available providers
-const providers = currency.getAvailableProviders() // ['google', 'fixer']
+// List available exchanges
+const exchanges = currency.getAvailableExchanges() // ['google', 'fixer']
 ```
 
 ### Utility Methods
@@ -140,7 +133,7 @@ const currencies = await currency.getSupportedCurrencies()
 // Result: ['USD', 'EUR', 'GBP', 'JPY', ...]
 ```
 
-## 🔌 Providers
+## 🔌 Exchanges
 
 ### Google Finance Provider
 Free provider, no API key required:
@@ -148,7 +141,7 @@ Free provider, no API key required:
 ```typescript
 const currency = createCurrency({
   default: 'google',
-  providers: {
+  exchanges: {
     google: exchanges.google({
       base: 'USD',        // Base currency (default: 'USD')
       timeout: 5000,      // Request timeout in ms (optional)
@@ -163,7 +156,7 @@ Requires API key from [fixer.io](https://fixer.io):
 ```typescript
 const currency = createCurrency({
   default: 'fixer',
-  providers: {
+  exchanges: {
     fixer: exchanges.fixer({
       accessKey: 'your-api-key',  // Required: Your Fixer.io API key
       base: 'EUR',                // Base currency (default: 'EUR')
@@ -175,13 +168,13 @@ const currency = createCurrency({
 
 ## ⚙️ Configuration
 
-### Multiple Providers Setup
-Configure multiple providers and switch between them:
+### Multiple Exchanges Setup
+Configure multiple exchanges and switch between them:
 
 ```typescript
 const currency = createCurrency({
   default: 'google',
-  providers: {
+  exchanges: {
     google: exchanges.google({ base: 'USD' }),
     fixer: exchanges.fixer({ accessKey: 'your-key' }),
   },
@@ -203,7 +196,7 @@ Full TypeScript support with intelligent type inference:
 // Provider names are type-safe
 const currency = createCurrency({
   default: 'google', // ✅ Type-safe
-  providers: {
+  exchanges: {
     google: exchanges.google({ base: 'USD' }),
     fixer: exchanges.fixer({ accessKey: 'key' }),
   },
@@ -235,9 +228,9 @@ if (result.success) {
 }
 ```
 
-## 🔧 Custom Providers
+## 🔧 Custom Exchanges
 
-Extend the system with custom providers:
+Extend the system with custom exchanges:
 
 ```typescript
 import { BaseCurrencyProvider } from '@mixxtor/currencyx-js'
@@ -274,7 +267,7 @@ class CustomProvider extends BaseCurrencyProvider {
   async latestRates(params: ExchangeRatesParams) {
     try {
       // Your custom rates logic
-      const rates = await this.fetchRatesFromAPI(params.base, params.symbols)
+      const rates = await this.fetchRatesFromAPI(params)
 
       return {
         success: true,
@@ -300,7 +293,7 @@ class CustomProvider extends BaseCurrencyProvider {
     return 0.85 // Example rate
   }
 
-  private async fetchRatesFromAPI(base: string, symbols: string[]) {
+  private async fetchRatesFromAPI(params: { base: string, codes: string[] }) {
     // Implement your API call logic
     return { EUR: 0.85, GBP: 0.73 }
   }
@@ -309,7 +302,7 @@ class CustomProvider extends BaseCurrencyProvider {
 // Use your custom provider
 const currency = createCurrency({
   default: 'custom',
-  providers: {
+  exchanges: {
     custom: new CustomProvider({ base: 'USD', apiKey: 'your-key' }),
   },
 })
@@ -336,7 +329,7 @@ const result = await currency.convert(100, 'USD', 'EUR')
 // New API (v1.x)
 const currency = createCurrency({
   default: 'google',
-  providers: {
+  exchanges: {
     google: exchanges.google({ base: 'USD' }),
   },
 })

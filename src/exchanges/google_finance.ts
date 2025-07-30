@@ -2,6 +2,7 @@
  * Google Finance Exchange
  */
 
+import axios from 'axios'
 import type {
   CurrencyCode,
   ConversionResult,
@@ -11,6 +12,7 @@ import type {
   ConvertParams,
 } from '../types/index.js'
 import { BaseCurrencyExchange } from './base_exchange.js'
+import * as cheerio from 'cheerio'
 
 export class GoogleFinanceExchange extends BaseCurrencyExchange {
   readonly name = 'google'
@@ -98,31 +100,27 @@ export class GoogleFinanceExchange extends BaseCurrencyExchange {
   async #getRate(from: CurrencyCode, to: CurrencyCode): Promise<number | undefined> {
     try {
       const url = `${this.baseUrl}/quote/${from}-${to}`
+      const timeout = 2000
       const userAgent =
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'
 
-      const response = await fetch(url, {
+      const response = await axios.get(url, {
         headers: { 'User-Agent': userAgent },
-        signal: AbortSignal.timeout(this.timeout),
+        timeout: timeout,
       })
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-      }
-
-      const html = await response.text()
-
-      // Parse HTML to extract rate using regex (since we can't use cheerio in browser)
-      const rate = this.#parseRateFromHtml(html, from, to)
-
+      const $ = cheerio.load(response.data)
+      const block = $(`div[data-source="${from}"][data-target="${to}"]`)
+      const rateString = block.children().first().text()
+      const stringWithoutCommas = rateString.replace(/,/g, '') // remove commas from the string
+      const rate = Number.parseFloat(stringWithoutCommas)
       if (rate && !isNaN(rate)) {
         return rate
+      } else {
+        console.error(`Google Finance: Failed to get ${from}-${to} rate.`)
       }
-
-      throw new Error(`Failed to parse rate for ${from}-${to}`)
     } catch (error) {
-      console.error(`Google Finance: Failed to get ${from}-${to} rate:`, error)
-      return undefined
+      console.error(error)
     }
   }
 

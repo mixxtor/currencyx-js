@@ -6,6 +6,9 @@ export type { CountryCode, CurrencyCode, CurrencyInfo }
 
 /**
  * Parameters for currency conversion
+ * @param amount - The amount to convert
+ * @param from - The source currency code (ISO 4217)
+ * @param to - The target currency code (ISO 4217)
  */
 export type ConvertParams = {
   amount: number
