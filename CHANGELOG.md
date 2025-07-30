@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 
 
+## [2.0.0](https://github.com/mixxtor/currencyx-js/compare/v1.1.5...v2.0.0) (2025-07-30)
+
+### ✨ Features
+
+* add error handling classes for currency operations ([3bd6fc9](https://github.com/mixxtor/currencyx-js/commit/3bd6fc97d6583af297ae9e1d963a00c88d885520))
+
+### ♻️ Code Refactoring
+
+* extend currency service ([270d663](https://github.com/mixxtor/currencyx-js/commit/270d6634e0babccb1188cd45b71ed29db176de6a))
+
 ## [1.1.5](https://github.com/mixxtor/currencyx-js/compare/v1.1.3...v1.1.5) (2025-07-29)
 
 ### ♻️ Code Refactoring
