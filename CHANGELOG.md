@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 
 
+## [2.1.0](https://github.com/mixxtor/currencyx-js/compare/v2.0.0...v2.1.0) (2025-07-31)
+
+### ✨ Features
+
+* enhance rounding functionality with TRoundOptions and update currency filtering descriptions ([056da50](https://github.com/mixxtor/currencyx-js/commit/056da50ca331788974a4e5cc382aa0e20074cd9a))
+
 ## [2.0.0](https://github.com/mixxtor/currencyx-js/compare/v1.1.5...v2.0.0) (2025-07-30)
 
 ### ✨ Features
