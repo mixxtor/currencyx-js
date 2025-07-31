@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 
 
+## [2.1.1](https://github.com/mixxtor/currencyx-js/compare/v2.1.0...v2.1.1) (2025-07-31)
+
+### 🔧 Maintenance
+
+* **docs:** update README ([840724a](https://github.com/mixxtor/currencyx-js/commit/840724add06b91c32f737d2f2c266621c6ff695c))
+
 ## [2.1.0](https://github.com/mixxtor/currencyx-js/compare/v2.0.0...v2.1.0) (2025-07-31)
 
 ### ✨ Features
