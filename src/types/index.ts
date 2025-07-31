@@ -49,6 +49,11 @@ export interface ConversionResult extends BaseResult {
   result?: number
 }
 
+export type TRoundOptions = {
+  precision: number;
+  direction?: 'up' | 'down';
+} & Record<string, number | string>;
+
 /**
  * Exchange rates result
  */

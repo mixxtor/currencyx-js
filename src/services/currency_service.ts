@@ -5,13 +5,15 @@ import type {
   CurrencyCode,
   ConvertParams,
   ExchangeRatesParams,
+  TRoundOptions,
 } from '../types/index.js'
 import { BaseCurrencyExchange } from '../exchanges/base_exchange.js'
+import type { CurrencyExchangeContract } from '../contracts/currency_exchange.js'
 
 /**
  * Main Currency Service Implementation
  */
-export class CurrencyService<KnownExchanges extends Record<string, BaseCurrencyExchange> = Record<string, BaseCurrencyExchange>> extends BaseCurrencyExchange {
+export class CurrencyService<KnownExchanges extends Record<string, BaseCurrencyExchange> = Record<string, BaseCurrencyExchange>> extends BaseCurrencyExchange implements CurrencyExchangeContract {
   #exchanges: Map<keyof KnownExchanges, KnownExchanges[keyof KnownExchanges]> = new Map()
   #currentExchangeName: keyof KnownExchanges
   #config: CurrencyConfig<KnownExchanges>
@@ -112,9 +114,9 @@ export class CurrencyService<KnownExchanges extends Record<string, BaseCurrencyE
   /**
    * Round currency value
    */
-  round(value: number, precision: number = 2): number {
+  round(value: number, options: TRoundOptions = { precision: 2, direction: 'up' }): number {
     const exchange = this.#getActiveExchange()
-    return exchange.round(value, precision)
+    return exchange.round(value, options)
   }
 
   /**

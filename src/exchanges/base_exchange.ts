@@ -6,6 +6,7 @@ import type {
   ExchangeRatesParams,
   CurrencyInfo,
   CountryCode,
+  TRoundOptions,
 } from '../types/index.js'
 import type { CurrencyExchangeContract } from '../contracts/currency_exchange.js'
 import { getList } from '../data/currencies.js'
@@ -29,14 +30,15 @@ export abstract class BaseCurrencyExchange implements CurrencyExchangeContract {
   }
 
   /**
-   * Get all currencies
+   * Get all constant currencies
    */
   getList() {
     return getList()
   }
 
   /**
-   * Filter currencies by name
+   * Filter constant currencies by name
+   * @param {string} name - Currency name
    */
   filterByName(name: CurrencyInfo['name']): CurrencyInfo[]
   filterByName(name: string) {
@@ -44,15 +46,15 @@ export abstract class BaseCurrencyExchange implements CurrencyExchangeContract {
   }
 
   /**
-   * Filter currencies by country
+   * Filter constant currencies by country
+   * @param {string} iso2 - Country ISO2 code
    */
   filterByCountry(iso2: CountryCode) {
     return this.getList().filter(c => c.countries.find(c => c === iso2.toUpperCase()))
   }
 
   /**
-   * Get currency info by country ISO2 code (e.g., 'US')
-   *
+   * Get constant currency info by country ISO2 code (e.g., 'US')
    * @param {string} iso2
    */
   getByCountry(iso2: CountryCode): CurrencyInfo | undefined
@@ -61,18 +63,16 @@ export abstract class BaseCurrencyExchange implements CurrencyExchangeContract {
   }
 
   /**
-   * Get currency info by ISO code (e.g., 'USD')
-   *
-   * @param {string} code
+   * Get constant currency info by ISO code (e.g., 'USD')
+   * @param {string} code - Currency ISO code
    */
   getByCode(code: CurrencyCode): CurrencyInfo | undefined {
     return this.getList().find((c) => c.code === code)
   }
 
   /**
-   * Get currency info by symbol (e.g., '$')
-   *
-   * @param {string} symbol
+   * Get constant currency info by symbol (e.g., '$')
+   * @param {string} symbol - Currency symbol (e.g., '$')
    */
   getBySymbol(symbol: CurrencyInfo['symbol']): CurrencyInfo | undefined
   getBySymbol(symbol: string) {
@@ -80,9 +80,8 @@ export abstract class BaseCurrencyExchange implements CurrencyExchangeContract {
   }
 
   /**
-   * Get currency info by numeric code (e.g., '840')
-   *
-   * @param {string} numCode
+   * Get constant currency info by numeric code (e.g., '840')
+   * @param {string} numCode - Currency numeric code
    */
   getByNumericCode(numCode: CurrencyInfo['numeric_code']): CurrencyInfo | undefined
   getByNumericCode(numCode: string) {
@@ -136,14 +135,39 @@ export abstract class BaseCurrencyExchange implements CurrencyExchangeContract {
 
   /**
    * Round currency value according to currency rules
+   *
+   * @param {number} amount - Currency value
+   * @param {TRoundOptions} options
+   * @param {number} options.precision - Decimal precision. Default is 2
+   * @param {string} options.direction - Round direction. Default is 'up'
    */
-  round(value: number, precision?: number): number {
-    if (precision !== undefined) {
-      return Math.round(value * Math.pow(10, precision)) / Math.pow(10, precision)
+  round(amount: number, options: TRoundOptions = { precision: 2, direction: 'up' }): number {
+    const { precision } = options
+
+    if (options?.precision !== undefined) {
+      return Math.round(Number(amount) * Math.pow(10, precision)) / Math.pow(10, precision)
     }
 
     // Use default precision of 2 decimal places
-    return Math.round(value * 100) / 100
+    return Math.round((Number(amount) + Number.EPSILON) * 100) / 100
+  }
+
+  /**
+   * Rounds a given money amount to the nearest roundable value for the given currency.
+   *
+   * @param {number} amount - The amount of money to round.
+   * @param {CurrencyCode} [currency='USD'] - The currency to determine the rounding for.
+   * @return {number} The rounded amount.
+   */
+  public roundMoney(amount: number, currency: CurrencyCode = 'USD'): number {
+    const data = this.getByCode(currency)
+    if (data && data?.round > 1) {
+      return data.round == 100 && data.decimal != 0
+        ? Math.round(amount * data?.round) / data?.round
+        : Math.round(amount / data?.round) * data?.round
+    }
+
+    return this.round(amount)
   }
 
   /**

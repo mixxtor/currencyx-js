@@ -5,6 +5,7 @@ import type {
   ExchangeRatesResult,
   ConvertParams,
   CurrencyInfo,
+  TRoundOptions,
 } from '../types/index.js'
 
 /**
@@ -60,6 +61,11 @@ export interface CurrencyExchangeContract {
 
   /**
    * Round currency value
+   *
+   * @param {number} value - Currency value
+   * @param {TRoundOptions} options
+   * @param {number} options.precision - Decimal precision
+   * @param {string} options.direction - Round direction
    */
-  round(value: number, precision?: number): number
+  round(value: number, options?: TRoundOptions): number
 }
