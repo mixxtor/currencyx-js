@@ -1,9 +1,3 @@
-/**
- * Configuration Helper
- *
- * Provides type-safe configuration definition similar to @adonisjs/drive
- */
-
 import type { BaseCurrencyExchange } from '../exchanges/base_exchange.js';
 import type { CurrencyConfig } from '../types/index.js'
 
