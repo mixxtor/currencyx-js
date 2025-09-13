@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 
 
+## [2.2.1](https://github.com/mixxtor/currencyx-js/compare/v2.1.1...v2.2.1) (2025-09-13)
+
+### 🔧 Maintenance
+
+* **deps:** update actions/checkout action to v5 ([33bd839](https://github.com/mixxtor/currencyx-js/commit/33bd839e0a14df7f6c021304ad95d9175becf59a))
+* **deps:** update dependency @types/node to v24.3.0 ([fec2838](https://github.com/mixxtor/currencyx-js/commit/fec28388e30986c156159a134f16f0d3d003b0f0))
+* **deps:** update dependency eslint to v9.34.0 ([d5728c3](https://github.com/mixxtor/currencyx-js/commit/d5728c3b795e09f0704be8591db22a4ab5cfca27))
+* **deps:** update dependency node to v22 ([e02942c](https://github.com/mixxtor/currencyx-js/commit/e02942cd5b5035e0adbc0049e7f376ca8696ecea))
+* **deps:** update typescript-eslint monorepo to v8.41.0 ([54056b2](https://github.com/mixxtor/currencyx-js/commit/54056b24646065be66b9a45ea5857a6e4caab958))
+* release v2.2.0 ([6b9fe7e](https://github.com/mixxtor/currencyx-js/commit/6b9fe7e3cd40a41e96798e73a3301909ac7b33e3))
+* update dependencies and remove outdated comments in configuration helper ([cc0caca](https://github.com/mixxtor/currencyx-js/commit/cc0caca06b258c5de63faec67abccf5dd222b1c9))
+
 ## [2.2.0](https://github.com/mixxtor/currencyx-js/compare/v2.1.1...v2.2.0) (2025-09-13)
 
 ### 🔧 Maintenance
