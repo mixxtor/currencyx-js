@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 
 
+## [2.2.2](https://github.com/mixxtor/currencyx-js/compare/v2.2.1...v2.2.2) (2025-10-29)
+
+### 🐛 Bug Fixes
+
+* Improve currency rounding logic and add comprehensive tests ([8f03a27](https://github.com/mixxtor/currencyx-js/commit/8f03a279dd52fbceb06ea8831b1ae69956b1ddda))
+
 ## [2.2.1](https://github.com/mixxtor/currencyx-js/compare/v2.1.1...v2.2.1) (2025-09-13)
 
 ### 🔧 Maintenance
