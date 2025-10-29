@@ -161,10 +161,12 @@ export abstract class BaseCurrencyExchange implements CurrencyExchangeContract {
    */
   public roundMoney(amount: number, currency: CurrencyCode = 'USD'): number {
     const data = this.getByCode(currency)
-    if (data && data?.round > 1) {
-      return data.round == 100 && data.decimal != 0
-        ? Math.round(amount * data?.round) / data?.round
-        : Math.round(amount / data?.round) * data?.round
+    if (data && data.round) {
+      // Round to the nearest increment defined by data.round
+      // For example: round: 0.01 means round to nearest cent
+      //              round: 0.05 means round to nearest 5 cents
+      //              round: 1 means round to nearest whole unit
+      return Math.round(amount / data.round) * data.round
     }
 
     return this.round(amount)
