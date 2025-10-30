@@ -1,6 +1,6 @@
 {
   "name": "@mixxtor/currencyx-js",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "description": "Modern TypeScript currency converter with type inference and multiple providers (Google Finance, Fixer.io). Framework agnostic with clean architecture.",
   "type": "module",
   "main": "dist/index.js",

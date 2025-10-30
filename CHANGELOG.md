@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 
 
+## [2.2.3](https://github.com/mixxtor/currencyx-js/compare/v2.2.2...v2.2.3) (2025-10-30)
+
+### 🐛 Bug Fixes
+
+* Enhance roundMoney method for better precision and add edge case tests ([e20311a](https://github.com/mixxtor/currencyx-js/commit/e20311a2d150ca587a4eb0d16242b0ba1ca3109d))
+
 ## [2.2.2](https://github.com/mixxtor/currencyx-js/compare/v2.2.1...v2.2.2) (2025-10-29)
 
 ### 🐛 Bug Fixes
