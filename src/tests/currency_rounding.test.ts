@@ -312,6 +312,15 @@ describe('Currency Rounding System', () => {
       expect(exchange.roundMoney(0.1 + 0.2, 'USD')).toBeCloseTo(0.30, 2)
       expect(exchange.roundMoney(1.005, 'USD')).toBeCloseTo(1.00, 2) // Standard rounding case
       expect(exchange.roundMoney(2.675, 'USD')).toBeCloseTo(2.68, 2)
+      
+      // Specific test for the reported issue: roundMoney(29.99, 'USD') should return exactly 29.99
+      expect(exchange.roundMoney(29.99, 'USD')).toBe(29.99) // Should be exact, not 29.990000000000002
+      
+      // Additional edge cases that can cause precision issues
+      expect(exchange.roundMoney(19.99, 'USD')).toBe(19.99)
+      expect(exchange.roundMoney(9.99, 'USD')).toBe(9.99)
+      expect(exchange.roundMoney(99.99, 'USD')).toBe(99.99)
+      expect(exchange.roundMoney(199.99, 'USD')).toBe(199.99)
     })
   })
 })

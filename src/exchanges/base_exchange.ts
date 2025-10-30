@@ -153,23 +153,42 @@ export abstract class BaseCurrencyExchange implements CurrencyExchangeContract {
   }
 
   /**
-   * Rounds a given money amount to the nearest roundable value for the given currency.
+   * Rounds a money amount to the nearest valid value for the given currency.
    *
-   * @param {number} amount - The amount of money to round.
-   * @param {CurrencyCode} [currency='USD'] - The currency to determine the rounding for.
-   * @return {number} The rounded amount.
+   * Handles:
+   *  - Fractional rounding (e.g., 0.01, 0.05)
+   *  - Whole number rounding (e.g., 1, 5, 10)
+   *  - Avoids floating-point precision issues
+   *  - Works correctly for any rounding increment, including non-decimal-friendly ones (e.g., 0.2, 0.25)
+   *
+   * @example
+   *   round: 0.01 → round to nearest cent
+   *   round: 0.05 → round to nearest 5 cents
+   *   round: 0.2  → round to nearest 0.2 unit
+   *   round: 1    → round to nearest whole unit
+   *
+   * @param {number} amount - The amount to round
+   * @param {CurrencyCode} [currency='USD'] - The currency to determine rounding rules
+   * @return {number} The rounded amount
    */
   public roundMoney(amount: number, currency: CurrencyCode = 'USD'): number {
     const data = this.getByCode(currency)
-    if (data && data.round) {
-      // Round to the nearest increment defined by data.round
-      // For example: round: 0.01 means round to nearest cent
-      //              round: 0.05 means round to nearest 5 cents
-      //              round: 1 means round to nearest whole unit
-      return Math.round(amount / data.round) * data.round
+
+    // Fallback if currency data is invalid or amount is not a number
+    if (!data || isNaN(amount) || data.round <= 0) {
+      return this.round(amount)
     }
 
-    return this.round(amount)
+    const { round } = data
+
+    // Determine the number of decimal places based on the rounding increment
+    const decimalPlaces = round < 1 ? Math.ceil(-Math.log10(round)) : 0
+
+    // Round to the nearest increment
+    const rounded = Math.round(amount / round) * round
+
+    // Fix floating-point artifacts
+    return Number(rounded.toFixed(decimalPlaces))
   }
 
   /**
