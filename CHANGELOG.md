@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+
+
+## [2.2.4](///compare/v2.2.3...v2.2.4) (2025-11-23)
+
 ## [2.2.3](https://github.com/mixxtor/currencyx-js/compare/v2.2.2...v2.2.3) (2025-10-30)
 
 ### 🐛 Bug Fixes
