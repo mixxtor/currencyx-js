@@ -13,7 +13,10 @@ import type { CurrencyExchangeContract } from '../contracts/currency_exchange.js
 /**
  * Main Currency Service Implementation
  */
-export class CurrencyService<KnownExchanges extends Record<string, BaseCurrencyExchange> = Record<string, BaseCurrencyExchange>> extends BaseCurrencyExchange implements CurrencyExchangeContract {
+export class CurrencyService<KnownExchanges extends Record<string, BaseCurrencyExchange> = Record<string, BaseCurrencyExchange>>
+  extends BaseCurrencyExchange
+  implements CurrencyExchangeContract
+{
   #exchanges: Map<keyof KnownExchanges, KnownExchanges[keyof KnownExchanges]> = new Map()
   #currentExchangeName: keyof KnownExchanges
   #config: CurrencyConfig<KnownExchanges>
@@ -28,7 +31,7 @@ export class CurrencyService<KnownExchanges extends Record<string, BaseCurrencyE
 
     const exchange = this.#exchanges.get(this.#currentExchangeName)
     this.base = exchange?.base || 'USD'
-    this.name = exchange?.name || null as unknown as string
+    this.name = exchange?.name || (null as unknown as string)
   }
 
   /**
@@ -142,7 +145,7 @@ export class CurrencyService<KnownExchanges extends Record<string, BaseCurrencyE
    * @param {CurrencyCode} params.code - Currency code
    * @param {string} params.locale - Locale to use for formatting
    */
-  formatCurrency(params: { amount: number, code: CurrencyCode, locale?: string }): string {
+  formatCurrency(params: { amount: number; code: CurrencyCode; locale?: string }): string {
     const { amount, code: currencyCode, locale = 'en-US' } = params
     try {
       return new Intl.NumberFormat(locale, {

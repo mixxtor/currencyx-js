@@ -14,7 +14,7 @@ describe('Currency System Final Validation', () => {
     // This was the original problem: roundMoney(123, 'USD') returned 0
     const result = exchange.roundMoney(123, 'USD')
     expect(result).toBe(123)
-    
+
     console.log('✅ Original issue FIXED: roundMoney(123, "USD") =', result)
   })
 
@@ -23,7 +23,7 @@ describe('Currency System Final Validation', () => {
       majorCurrencies: 0,
       specialRounding: 0,
       regionalCurrencies: 0,
-      totalTested: 0
+      totalTested: 0,
     }
 
     // Test major world currencies
@@ -34,10 +34,10 @@ describe('Currency System Final Validation', () => {
       { code: 'JPY', amount: 123.456, expected: 123, description: 'Japanese Yen' },
       { code: 'CHF', amount: 123.456, expected: 123.45, description: 'Swiss Franc (0.05 rounding)' },
       { code: 'CAD', amount: 123.456, expected: 123.45, description: 'Canadian Dollar (0.05 rounding)' },
-      { code: 'AUD', amount: 123.456, expected: 123.45, description: 'Australian Dollar (0.05 rounding)' }
+      { code: 'AUD', amount: 123.456, expected: 123.45, description: 'Australian Dollar (0.05 rounding)' },
     ]
 
-    majorCurrencies.forEach(test => {
+    majorCurrencies.forEach((test) => {
       const result = exchange.roundMoney(test.amount, test.code)
       expect(Math.abs(result - test.expected)).toBeLessThan(0.01)
       testResults.majorCurrencies++
@@ -51,10 +51,10 @@ describe('Currency System Final Validation', () => {
       { code: 'IDR', amount: 15350, expected: 15400, description: 'Indonesian Rupiah (100 rounding - practical usage)' },
       { code: 'KMF', amount: 150, expected: 200, description: 'Comoro Franc (100 rounding)' },
       { code: 'XAG', amount: 1.2346, expected: 1.235, description: 'Silver (0.001 precision)' },
-      { code: 'KWD', amount: 1.2346, expected: 1.235, description: 'Kuwaiti Dinar (0.001 precision)' }
+      { code: 'KWD', amount: 1.2346, expected: 1.235, description: 'Kuwaiti Dinar (0.001 precision)' },
     ]
 
-    specialCurrencies.forEach(test => {
+    specialCurrencies.forEach((test) => {
       const result = exchange.roundMoney(test.amount, test.code)
       if (test.code === 'XAG' || test.code === 'KWD') {
         expect(Math.abs(result - test.expected)).toBeLessThan(0.001)
@@ -72,10 +72,10 @@ describe('Currency System Final Validation', () => {
       { code: 'BRL', amount: 123.456, expected: 123.46, description: 'Brazilian Real' },
       { code: 'ZAR', amount: 123.456, expected: 123.46, description: 'South African Rand' },
       { code: 'NGN', amount: 123.456, expected: 123.46, description: 'Nigerian Naira' },
-      { code: 'AED', amount: 123.456, expected: 123.46, description: 'UAE Dirham' }
+      { code: 'AED', amount: 123.456, expected: 123.46, description: 'UAE Dirham' },
     ]
 
-    regionalCurrencies.forEach(test => {
+    regionalCurrencies.forEach((test) => {
       const result = exchange.roundMoney(test.amount, test.code)
       expect(Math.abs(result - test.expected)).toBeLessThan(0.01)
       testResults.regionalCurrencies++
@@ -87,25 +87,25 @@ describe('Currency System Final Validation', () => {
     console.log(`   Special Rounding: ${testResults.specialRounding} passed`)
     console.log(`   Regional Currencies: ${testResults.regionalCurrencies} passed`)
     console.log(`   Total Tested: ${testResults.totalTested} currencies`)
-    
+
     expect(testResults.totalTested).toBe(19) // Should test 19 currencies total (added VND and IDR to special cases)
   })
 
   it('should validate all currency data is now clean', () => {
     const currencies = getList()
-    const activeCurrencies = currencies.filter(c => typeof c.code === 'string' && c.code.length === 3)
-    
+    const activeCurrencies = currencies.filter((c) => typeof c.code === 'string' && c.code.length === 3)
+
     // Count currencies by rounding type
     const roundingStats = {
       '0.01': 0,
-      '0.05': 0, 
+      '0.05': 0,
       '1.0': 0,
       '0.001': 0,
       'other': 0,
-      'total': activeCurrencies.length
+      'total': activeCurrencies.length,
     }
 
-    activeCurrencies.forEach(currency => {
+    activeCurrencies.forEach((currency) => {
       switch (currency.round) {
         case 0.01:
           roundingStats['0.01']++
@@ -141,15 +141,15 @@ describe('Currency System Final Validation', () => {
     const currencies = ['USD', 'EUR', 'JPY', 'GBP', 'CHF']
     let totalTime = 0
 
-    currencies.forEach(currency => {
+    currencies.forEach((currency) => {
       const startTime = Date.now()
-      
+
       for (let i = 0; i < iterations; i++) {
         exchange.roundMoney(Math.random() * 1000, currency)
       }
-      
+
       const endTime = Date.now()
-      totalTime += (endTime - startTime)
+      totalTime += endTime - startTime
     })
 
     const avgTimePerCurrency = totalTime / currencies.length
@@ -172,7 +172,7 @@ describe('Currency System Summary', () => {
       'Real-world Compliance': 'All currencies now follow proper ISO 4217 rounding conventions',
       'Comprehensive Testing': '82 comprehensive tests covering all currency types and edge cases',
       'Performance Optimized': 'System handles thousands of operations per second reliably',
-      'Production Ready': 'All major world currencies work correctly with accurate rounding'
+      'Production Ready': 'All major world currencies work correctly with accurate rounding',
     }
 
     Object.entries(accomplishments).forEach(([key, value]) => {

@@ -55,6 +55,7 @@ if (result.success) {
 ### Core Methods (Object Parameters)
 
 #### `convert(params: ConvertParams)`
+
 Convert currency with explicit object parameters:
 
 ```typescript
@@ -76,6 +77,7 @@ interface ConversionResult {
 ```
 
 #### `getExchangeRates(params: ExchangeRatesParams)`
+
 Get exchange rates with object parameters:
 
 ```typescript
@@ -84,7 +86,7 @@ const rates = await currency.getExchangeRates({
   codes: ['EUR', 'GBP', 'JPY'],
 })
 
-// Result structure  
+// Result structure
 interface ExchangeRatesResult {
   success: boolean
   base: string
@@ -98,6 +100,7 @@ interface ExchangeRatesResult {
 ### Convenience Methods (Positional Parameters)
 
 #### `latestRates({ base, codes })`
+
 Shorthand for getting rates:
 
 ```typescript
@@ -167,6 +170,7 @@ const rounded = currency.roundMoney(123.456, 'USD')
 ## 🔌 Exchanges
 
 ### Google Finance Exchange
+
 Free provider, no API key required:
 
 ```typescript
@@ -174,14 +178,15 @@ const currency = createCurrency({
   default: 'google',
   exchanges: {
     google: exchanges.google({
-      base: 'USD',        // Base currency (default: 'USD')
-      timeout: 5000,      // Request timeout in ms (optional)
+      base: 'USD', // Base currency (default: 'USD')
+      timeout: 5000, // Request timeout in ms (optional)
     }),
   },
 })
 ```
 
 ### Fixer.io Exchange
+
 Requires API key from [fixer.io](https://fixer.io):
 
 ```typescript
@@ -189,9 +194,9 @@ const currency = createCurrency({
   default: 'fixer',
   exchanges: {
     fixer: exchanges.fixer({
-      accessKey: 'your-api-key',  // Required: Your Fixer.io API key
-      base: 'USD',                // Base currency (default: 'USD' for this library, Fixer default: 'EUR')
-      timeout: 10000,             // Request timeout in ms (optional)
+      accessKey: 'your-api-key', // Required: Your Fixer.io API key
+      base: 'USD', // Base currency (default: 'USD' for this library, Fixer default: 'EUR')
+      timeout: 10000, // Request timeout in ms (optional)
     }),
   },
 })
@@ -200,6 +205,7 @@ const currency = createCurrency({
 ## ⚙️ Configuration
 
 ### Multiple Exchanges Setup
+
 Configure multiple exchanges and switch between them:
 
 ```typescript
@@ -221,6 +227,7 @@ const fixerResult = await currency.convert({ amount: 100, from: 'USD', to: 'EUR'
 ```
 
 ### Type Safety
+
 Full TypeScript support with intelligent type inference:
 
 ```typescript
@@ -234,8 +241,8 @@ const currency = createCurrency({
 })
 
 // Only valid exchange names are allowed
-currency.use('google')   // ✅ Valid
-currency.use('invalid')  // ❌ TypeScript error
+currency.use('google') // ✅ Valid
+currency.use('invalid') // ❌ TypeScript error
 ```
 
 ## 🛡️ Error Handling
@@ -282,22 +289,12 @@ class CustomExchange extends BaseCurrencyExchange {
       const rate = await this.getConvertRate(params.from, params.to)
       const result = params.amount * rate
 
-      return this.createConversionResult(
-        params.amount,
-        params.from,
-        params.to,
-        result,
-        rate
-      )
+      return this.createConversionResult(params.amount, params.from, params.to, result, rate)
     } catch (error) {
-      return this.createConversionResult(
-        params.amount,
-        params.from,
-        params.to,
-        undefined,
-        undefined,
-        { info: error.message, type: 'custom_error' }
-      )
+      return this.createConversionResult(params.amount, params.from, params.to, undefined, undefined, {
+        info: error.message,
+        type: 'custom_error',
+      })
     }
   }
 
@@ -308,11 +305,7 @@ class CustomExchange extends BaseCurrencyExchange {
 
       return this.createExchangeRatesResult(params.base, rates)
     } catch (error) {
-      return this.createExchangeRatesResult(
-        params.base,
-        {},
-        { info: error.message, type: 'custom_error' }
-      )
+      return this.createExchangeRatesResult(params.base, {}, { info: error.message, type: 'custom_error' })
     }
   }
 
@@ -321,7 +314,7 @@ class CustomExchange extends BaseCurrencyExchange {
     return 0.85 // Example rate
   }
 
-  private async fetchRatesFromAPI(params: { base: string, codes?: string[] }) {
+  private async fetchRatesFromAPI(params: { base: string; codes?: string[] }) {
     // Implement your API call logic
     return { EUR: 0.85, GBP: 0.73 }
   }

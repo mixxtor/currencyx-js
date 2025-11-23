@@ -8,7 +8,7 @@ const limiter = new RateLimiter(60, 60000) // 60 requests per minute
 // Define known exchanges type
 type KnownExchanges = {
   google: BaseCurrencyExchange
-  fixer?: BaseCurrencyExchange 
+  fixer?: BaseCurrencyExchange
 }
 
 // Create currency service with Google Finance provider
@@ -17,9 +17,9 @@ const currency = createCurrency<KnownExchanges>({
   exchanges: {
     google: exchanges.google({
       base: 'USD',
-      timeout: 5000
-    })
-  } as KnownExchanges
+      timeout: 5000,
+    }),
+  } as KnownExchanges,
 })
 
 // Example 1: Basic conversion with error handling
@@ -28,7 +28,7 @@ async function basicConversion() {
     const result = await currency.convert({
       amount: 100,
       from: 'USD',
-      to: 'EUR'
+      to: 'EUR',
     })
 
     if (result.success) {
@@ -51,7 +51,7 @@ async function batchConversion(amounts: number[], from: string, to: string) {
     // Check rate limiter
     if (limiter.isLimited()) {
       console.log('Rate limit reached, waiting...')
-      await new Promise(resolve => setTimeout(resolve, 1000))
+      await new Promise((resolve) => setTimeout(resolve, 1000))
     }
 
     // Check cache first
@@ -60,7 +60,7 @@ async function batchConversion(amounts: number[], from: string, to: string) {
       results.push({
         amount,
         result: amount * cachedRate,
-        cached: true
+        cached: true,
       })
       continue
     }
@@ -69,7 +69,7 @@ async function batchConversion(amounts: number[], from: string, to: string) {
     const result = await currency.convert({
       amount,
       from,
-      to
+      to,
     })
 
     if (result.success && result.info?.rate) {
@@ -77,7 +77,7 @@ async function batchConversion(amounts: number[], from: string, to: string) {
       results.push({
         amount,
         result: result.result,
-        cached: false
+        cached: false,
       })
     }
   }
@@ -93,22 +93,26 @@ async function compareExchanges() {
   // Using Google Finance
   currency.use('google')
   const googleResults = await Promise.all(
-    currencies.map(to => currency.convert({
-      amount: 100,
-      from: 'USD',
-      to
-    }))
+    currencies.map((to) =>
+      currency.convert({
+        amount: 100,
+        from: 'USD',
+        to,
+      })
+    )
   )
 
   // Using Fixer (if configured)
   if (currency.getAvailableExchanges().includes('fixer')) {
     currency.use('fixer')
     const fixerResults = await Promise.all(
-      currencies.map(to => currency.convert({
-        amount: 100,
-        from: 'USD',
-        to
-      }))
+      currencies.map((to) =>
+        currency.convert({
+          amount: 100,
+          from: 'USD',
+          to,
+        })
+      )
     )
 
     // Compare results

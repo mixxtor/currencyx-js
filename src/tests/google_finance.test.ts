@@ -20,7 +20,7 @@ describe('GoogleFinanceExchange', () => {
     const result = await exchange.convert({
       amount: 100,
       from: 'USD',
-      to: 'EUR'
+      to: 'EUR',
     })
 
     expect(result.success).toBe(true)
@@ -34,7 +34,7 @@ describe('GoogleFinanceExchange', () => {
     const result = await exchange.convert({
       amount: 100,
       from: 'USD',
-      to: 'ABC'
+      to: 'ABC',
     })
 
     expect(result.success).toBe(false)
@@ -52,7 +52,7 @@ describe('GoogleFinanceExchange', () => {
 
     const result = await exchange.latestRates({
       base: 'USD',
-      codes: ['EUR', 'GBP']
+      codes: ['EUR', 'GBP'],
     })
 
     expect(result.success).toBe(true)
@@ -60,15 +60,15 @@ describe('GoogleFinanceExchange', () => {
     expect(result.rates).toHaveProperty('GBP')
   })
 
-//   it('should handle network timeouts', async () => {
-//     global.fetch = vi.fn().mockRejectedValue(new Error('Timeout'))
+  //   it('should handle network timeouts', async () => {
+  //     global.fetch = vi.fn().mockRejectedValue(new Error('Timeout'))
 
-//     const result = await exchange.latestRates({
-//       base: 'USD',
-//       codes: ['EUR']
-//     })
+  //     const result = await exchange.latestRates({
+  //       base: 'USD',
+  //       codes: ['EUR']
+  //     })
 
-//     expect(result.success).toBe(false)
-//     expect(result.error?.type).toBe('timeout_error')
-//   })
+  //     expect(result.success).toBe(false)
+  //     expect(result.error?.type).toBe('timeout_error')
+  //   })
 })

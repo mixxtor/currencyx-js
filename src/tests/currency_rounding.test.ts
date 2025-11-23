@@ -28,35 +28,35 @@ describe('Currency Rounding System', () => {
   describe('Major Currency Rounding Rules', () => {
     describe('0.01 Rounding (Most Common)', () => {
       const currencies = ['USD', 'EUR', 'GBP', 'SGD', 'HKD']
-      
-      currencies.forEach(currency => {
+
+      currencies.forEach((currency) => {
         it(`should round ${currency} to nearest 0.01`, () => {
           expect(exchange.roundMoney(123.456, currency)).toBeCloseTo(123.46, 2)
           expect(exchange.roundMoney(123.454, currency)).toBeCloseTo(123.45, 2)
-          expect(exchange.roundMoney(99.999, currency)).toBeCloseTo(100.00, 2)
-          expect(exchange.roundMoney(0.001, currency)).toBeCloseTo(0.00, 2)
+          expect(exchange.roundMoney(99.999, currency)).toBeCloseTo(100.0, 2)
+          expect(exchange.roundMoney(0.001, currency)).toBeCloseTo(0.0, 2)
         })
       })
     })
 
     describe('0.05 Rounding (Swiss-style)', () => {
       const currencies = ['CHF', 'CAD', 'AUD', 'NZD']
-      
-      currencies.forEach(currency => {
+
+      currencies.forEach((currency) => {
         it(`should round ${currency} to nearest 0.05`, () => {
           expect(exchange.roundMoney(1.237, currency)).toBeCloseTo(1.25, 2)
           expect(exchange.roundMoney(1.227, currency)).toBeCloseTo(1.25, 2)
-          expect(exchange.roundMoney(1.222, currency)).toBeCloseTo(1.20, 2)
+          expect(exchange.roundMoney(1.222, currency)).toBeCloseTo(1.2, 2)
           expect(exchange.roundMoney(1.274, currency)).toBeCloseTo(1.25, 2)
-          expect(exchange.roundMoney(1.276, currency)).toBeCloseTo(1.30, 2)
+          expect(exchange.roundMoney(1.276, currency)).toBeCloseTo(1.3, 2)
         })
       })
     })
 
     describe('1.0 Rounding (No Decimals)', () => {
       const currencies = ['JPY', 'CLP', 'VUV', 'XAF', 'XOF', 'XPF', 'BIF', 'DJF', 'GNF', 'ISK', 'PYG', 'RWF', 'UGX']
-      
-      currencies.forEach(currency => {
+
+      currencies.forEach((currency) => {
         it(`should round ${currency} to nearest whole number`, () => {
           expect(exchange.roundMoney(123.456, currency)).toBe(123)
           expect(exchange.roundMoney(123.789, currency)).toBe(124)
@@ -110,19 +110,19 @@ describe('Currency Rounding System', () => {
         // VND: 500 rounding (cash transactions)
         expect(exchange.roundMoney(79015.16, 'VND')).toBe(79000)
         expect(exchange.roundMoney(79250, 'VND')).toBe(79500)
-        
+
         // IDR: 100 rounding (practical usage)
         expect(exchange.roundMoney(15350, 'IDR')).toBe(15400)
         expect(exchange.roundMoney(15349, 'IDR')).toBe(15300)
-        
+
         // MMK: 5 rounding (small denominations)
         expect(exchange.roundMoney(1503, 'MMK')).toBe(1505)
         expect(exchange.roundMoney(1502, 'MMK')).toBe(1500)
-        
+
         // KHR: 100 rounding (more reasonable than 1000)
         expect(exchange.roundMoney(2350, 'KHR')).toBe(2400)
         expect(exchange.roundMoney(2349, 'KHR')).toBe(2300)
-        
+
         // LAK: 100 rounding (more practical than 1000)
         expect(exchange.roundMoney(8650, 'LAK')).toBe(8700)
         expect(exchange.roundMoney(8649, 'LAK')).toBe(8600)
@@ -138,7 +138,7 @@ describe('Currency Rounding System', () => {
     })
 
     it('should handle very small amounts', () => {
-      expect(exchange.roundMoney(0.001, 'USD')).toBeCloseTo(0.00, 2)
+      expect(exchange.roundMoney(0.001, 'USD')).toBeCloseTo(0.0, 2)
       expect(exchange.roundMoney(0.009, 'USD')).toBeCloseTo(0.01, 2)
       expect(exchange.roundMoney(0.1, 'JPY')).toBe(0)
       expect(exchange.roundMoney(0.9, 'JPY')).toBe(1)
@@ -161,7 +161,7 @@ describe('Currency Rounding System', () => {
       // This tests the actual behavior
       const invalidResult1 = exchange.roundMoney(123, 'INVALID')
       const invalidResult2 = exchange.roundMoney(123, 'XXX')
-      
+
       // These should either throw OR return the original amount
       expect(typeof invalidResult1).toBe('number')
       expect(typeof invalidResult2).toBe('number')
@@ -177,48 +177,48 @@ describe('Currency Rounding System', () => {
     })
 
     it('should not contain any currencies with placeholder values', () => {
-      const activeCurrencies = currencies.filter(c => typeof c.code === 'string' && c.code.length === 3)
-      
+      const activeCurrencies = currencies.filter((c) => typeof c.code === 'string' && c.code.length === 3)
+
       // Since we fixed all currencies, this test confirms our TypeScript types are correct
       // All currencies should have valid data now
-      activeCurrencies.forEach(currency => {
+      activeCurrencies.forEach((currency) => {
         expect(typeof currency.round).toBe('number')
         expect(currency.round).toBeGreaterThanOrEqual(0)
         expect(currency.round).toBeLessThan(10000) // No more 9999999 values
-        
+
         expect(typeof currency.decimal).toBe('number')
         expect(currency.decimal).toBeLessThan(1000) // No more 111111 values
-        
+
         expect(typeof currency.delimiter).toBe('string')
         expect(currency.delimiter).not.toBe('DE_LI') // No more placeholder delimiters
-        
+
         expect(currency.short_format).not.toBe('FORSHRT') // No more placeholder formats
         expect(currency.explicit_format).not.toBe('FORMEX') // No more placeholder formats
       })
     })
 
     it('should have valid rounding values for all active currencies', () => {
-      const activeCurrencies = currencies.filter(c => typeof c.code === 'string' && c.code.length === 3)
+      const activeCurrencies = currencies.filter((c) => typeof c.code === 'string' && c.code.length === 3)
       const validRoundingValues = [0, 0.0001, 0.001, 0.01, 0.05, 0.2, 0.25, 0.5, 1, 5, 10, 100, 500, 1000, 1e-8]
 
-      activeCurrencies.forEach(currency => {
+      activeCurrencies.forEach((currency) => {
         expect(validRoundingValues).toContain(currency.round)
         expect(typeof currency.decimal).toBe('number')
         expect(currency.decimal).toBeGreaterThanOrEqual(0)
         expect(currency.decimal).toBeLessThanOrEqual(8)
         expect(typeof currency.delimiter).toBe('string')
-        expect([',' , '.'].includes(currency.delimiter)).toBe(true)
+        expect([',', '.'].includes(currency.delimiter)).toBe(true)
       })
     })
 
     it('should have proper format strings for all active currencies', () => {
-      const activeCurrencies = currencies.filter(c => typeof c.code === 'string' && c.code.length === 3)
+      const activeCurrencies = currencies.filter((c) => typeof c.code === 'string' && c.code.length === 3)
 
-      activeCurrencies.forEach(currency => {
+      activeCurrencies.forEach((currency) => {
         expect(typeof currency.short_format).toBe('string')
         expect(currency.short_format.length).toBeGreaterThan(0)
         expect(currency.short_format).toContain('{{amount}}')
-        
+
         expect(typeof currency.explicit_format).toBe('string')
         expect(currency.explicit_format.length).toBeGreaterThan(0)
         expect(currency.explicit_format).toContain('{{amount}}')
@@ -229,8 +229,8 @@ describe('Currency Rounding System', () => {
   describe('Regional Currency Groups', () => {
     describe('European Currencies', () => {
       const europeanCurrencies = ['EUR', 'GBP', 'CHF', 'NOK', 'SEK', 'DKK', 'PLN', 'CZK', 'HUF', 'RON']
-      
-      europeanCurrencies.forEach(currency => {
+
+      europeanCurrencies.forEach((currency) => {
         it(`should handle ${currency} correctly`, () => {
           const result = exchange.roundMoney(123.456, currency)
           expect(typeof result).toBe('number')
@@ -242,8 +242,8 @@ describe('Currency Rounding System', () => {
 
     describe('Asian Currencies', () => {
       const asianCurrencies = ['JPY', 'CNY', 'KRW', 'INR', 'SGD', 'HKD', 'THB', 'MYR', 'PHP', 'IDR', 'VND']
-      
-      asianCurrencies.forEach(currency => {
+
+      asianCurrencies.forEach((currency) => {
         it(`should handle ${currency} correctly`, () => {
           const result = exchange.roundMoney(123.456, currency)
           expect(typeof result).toBe('number')
@@ -254,8 +254,8 @@ describe('Currency Rounding System', () => {
 
     describe('American Currencies', () => {
       const americanCurrencies = ['USD', 'CAD', 'MXN', 'BRL', 'ARS', 'CLP', 'COP', 'PEN', 'UYU']
-      
-      americanCurrencies.forEach(currency => {
+
+      americanCurrencies.forEach((currency) => {
         it(`should handle ${currency} correctly`, () => {
           const result = exchange.roundMoney(123.456, currency)
           expect(typeof result).toBe('number')
@@ -267,8 +267,8 @@ describe('Currency Rounding System', () => {
 
     describe('Middle Eastern Currencies', () => {
       const middleEasternCurrencies = ['AED', 'SAR', 'QAR', 'KWD', 'BHD', 'JOD', 'ILS', 'TRY']
-      
-      middleEasternCurrencies.forEach(currency => {
+
+      middleEasternCurrencies.forEach((currency) => {
         it(`should handle ${currency} correctly`, () => {
           const result = exchange.roundMoney(123.456, currency)
           expect(typeof result).toBe('number')
@@ -283,14 +283,14 @@ describe('Currency Rounding System', () => {
     it('should handle multiple rapid rounding operations', () => {
       const iterations = 1000
       const startTime = Date.now()
-      
+
       for (let i = 0; i < iterations; i++) {
         exchange.roundMoney(Math.random() * 1000, 'USD')
       }
-      
+
       const endTime = Date.now()
       const duration = endTime - startTime
-      
+
       // Should complete 1000 operations in less than 100ms
       expect(duration).toBeLessThan(100)
     })
@@ -299,7 +299,7 @@ describe('Currency Rounding System', () => {
       const amount = 123.456
       const currency = 'USD'
       const expected = exchange.roundMoney(amount, currency)
-      
+
       // Run the same operation 100 times
       for (let i = 0; i < 100; i++) {
         const result = exchange.roundMoney(amount, currency)
@@ -309,13 +309,13 @@ describe('Currency Rounding System', () => {
 
     it('should handle floating point precision correctly', () => {
       // Test cases that could cause floating point issues
-      expect(exchange.roundMoney(0.1 + 0.2, 'USD')).toBeCloseTo(0.30, 2)
-      expect(exchange.roundMoney(1.005, 'USD')).toBeCloseTo(1.00, 2) // Standard rounding case
+      expect(exchange.roundMoney(0.1 + 0.2, 'USD')).toBeCloseTo(0.3, 2)
+      expect(exchange.roundMoney(1.005, 'USD')).toBeCloseTo(1.0, 2) // Standard rounding case
       expect(exchange.roundMoney(2.675, 'USD')).toBeCloseTo(2.68, 2)
-      
+
       // Specific test for the reported issue: roundMoney(29.99, 'USD') should return exactly 29.99
       expect(exchange.roundMoney(29.99, 'USD')).toBe(29.99) // Should be exact, not 29.990000000000002
-      
+
       // Additional edge cases that can cause precision issues
       expect(exchange.roundMoney(19.99, 'USD')).toBe(19.99)
       expect(exchange.roundMoney(9.99, 'USD')).toBe(9.99)

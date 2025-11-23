@@ -26,7 +26,7 @@ export abstract class BaseCurrencyExchange implements CurrencyExchangeContract {
    * Get all supported currency codes
    */
   public get currencies() {
-    return getList().map(c => c.code)
+    return getList().map((c) => c.code)
   }
 
   /**
@@ -50,7 +50,7 @@ export abstract class BaseCurrencyExchange implements CurrencyExchangeContract {
    * @param {string} iso2 - Country ISO2 code
    */
   filterByCountry(iso2: CountryCode) {
-    return this.getList().filter(c => c.countries.find(c => c === iso2.toUpperCase()))
+    return this.getList().filter((c) => c.countries.find((c) => c === iso2.toUpperCase()))
   }
 
   /**
@@ -59,7 +59,7 @@ export abstract class BaseCurrencyExchange implements CurrencyExchangeContract {
    */
   getByCountry(iso2: CountryCode): CurrencyInfo | undefined
   getByCountry(iso2: string) {
-    return this.getList().find((c) => c.countries.find(c => c === iso2.toUpperCase()))
+    return this.getList().find((c) => c.countries.find((c) => c === iso2.toUpperCase()))
   }
 
   /**
@@ -229,6 +229,4 @@ export abstract class BaseCurrencyExchange implements CurrencyExchangeContract {
       error,
     }
   }
-
-
 }

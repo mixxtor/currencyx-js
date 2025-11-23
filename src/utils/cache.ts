@@ -2,10 +2,11 @@
  * Cache implementation for currency rates
  */
 export class RateCache {
-  private cache: Map<string, { value: number, expires: number }> = new Map()
+  private cache: Map<string, { value: number; expires: number }> = new Map()
   private readonly defaultTTL: number
 
-  constructor(defaultTTL: number = 3600000) { // 1 hour default TTL
+  constructor(defaultTTL: number = 3600000) {
+    // 1 hour default TTL
     this.defaultTTL = defaultTTL
   }
 
@@ -23,7 +24,7 @@ export class RateCache {
     const key = this.getCacheKey(from, to)
     this.cache.set(key, {
       value,
-      expires: Date.now() + ttl
+      expires: Date.now() + ttl,
     })
   }
 
@@ -67,7 +68,8 @@ export class RateLimiter {
   private readonly interval: number
   private requests: number[] = []
 
-  constructor(limit: number = 60, interval: number = 60000) { // 60 requests per minute default
+  constructor(limit: number = 60, interval: number = 60000) {
+    // 60 requests per minute default
     this.limit = limit
     this.interval = interval
   }
@@ -77,8 +79,8 @@ export class RateLimiter {
    */
   isLimited(): boolean {
     const now = Date.now()
-    this.requests = this.requests.filter(time => now - time < this.interval)
-    
+    this.requests = this.requests.filter((time) => now - time < this.interval)
+
     if (this.requests.length >= this.limit) {
       return true
     }
@@ -92,7 +94,7 @@ export class RateLimiter {
    */
   remaining(): number {
     const now = Date.now()
-    this.requests = this.requests.filter(time => now - time < this.interval)
+    this.requests = this.requests.filter((time) => now - time < this.interval)
     return this.limit - this.requests.length
   }
 
@@ -123,23 +125,20 @@ export class RetryMechanism {
    */
   async execute<T>(fn: () => Promise<T>): Promise<T> {
     let lastError: Error
-    
+
     for (let attempt = 1; attempt <= this.maxRetries; attempt++) {
       try {
         return await fn()
       } catch (error) {
         lastError = error as Error
-        
+
         if (attempt === this.maxRetries) {
           throw error
         }
 
-        const delay = Math.min(
-          this.baseDelay * Math.pow(2, attempt - 1),
-          this.maxDelay
-        )
-        
-        await new Promise(resolve => setTimeout(resolve, delay))
+        const delay = Math.min(this.baseDelay * Math.pow(2, attempt - 1), this.maxDelay)
+
+        await new Promise((resolve) => setTimeout(resolve, delay))
       }
     }
 

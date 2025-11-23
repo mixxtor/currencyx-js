@@ -16,14 +16,14 @@ describe('Cache and Rate Limiting', () => {
 
     it('should return null for expired values', async () => {
       cache.set('USD', 'EUR', 0.85, 100) // 100ms TTL
-      await new Promise(resolve => setTimeout(resolve, 200))
+      await new Promise((resolve) => setTimeout(resolve, 200))
       expect(cache.get('USD', 'EUR')).toBeNull()
     })
 
     it('should cleanup expired entries', async () => {
       cache.set('USD', 'EUR', 0.85, 100)
       cache.set('USD', 'GBP', 0.73, 500)
-      await new Promise(resolve => setTimeout(resolve, 200))
+      await new Promise((resolve) => setTimeout(resolve, 200))
       cache.cleanup()
       expect(cache.get('USD', 'EUR')).toBeNull()
       expect(cache.get('USD', 'GBP')).toBe(0.73)

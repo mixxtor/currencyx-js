@@ -50,9 +50,9 @@ export interface ConversionResult extends BaseResult {
 }
 
 export type TRoundOptions = {
-  precision: number;
-  direction?: 'up' | 'down';
-} & Record<string, number | string>;
+  precision: number
+  direction?: 'up' | 'down'
+} & Record<string, number | string>
 
 /**
  * Exchange rates result
@@ -72,7 +72,7 @@ export interface BaseConfig extends Record<string, unknown> {
   timeout?: number
 }
 
-export interface GoogleFinanceConfig extends BaseConfig { }
+export interface GoogleFinanceConfig extends BaseConfig {}
 
 export interface FixerConfig extends BaseConfig {
   accessKey: string
@@ -82,7 +82,7 @@ export interface FixerConfig extends BaseConfig {
  * A list of known currency exchanges inferred from the user config
  * This interface must be extended in user-land
  */
-export interface CurrencyExchanges { }
+export interface CurrencyExchanges {}
 
 /**
  * Main currency configuration interface

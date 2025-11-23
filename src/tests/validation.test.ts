@@ -1,10 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import {
-  validateCurrencyCode,
-  validateAmount,
-  validateConvertParams,
-  validateExchangeRatesParams
-} from '../utils/validation'
+import { validateCurrencyCode, validateAmount, validateConvertParams, validateExchangeRatesParams } from '../utils/validation'
 import { ValidationError, InvalidCurrencyError } from '../errors'
 
 describe('Validation', () => {
@@ -37,53 +32,67 @@ describe('Validation', () => {
 
   describe('validateConvertParams', () => {
     it('should pass for valid parameters', () => {
-      expect(() => validateConvertParams({
-        amount: 100,
-        from: 'USD',
-        to: 'EUR'
-      })).not.toThrow()
+      expect(() =>
+        validateConvertParams({
+          amount: 100,
+          from: 'USD',
+          to: 'EUR',
+        })
+      ).not.toThrow()
     })
 
     it('should throw for invalid parameters', () => {
-      expect(() => validateConvertParams({
-        amount: -100,
-        from: 'USD',
-        to: 'EUR'
-      })).toThrow(ValidationError)
+      expect(() =>
+        validateConvertParams({
+          amount: -100,
+          from: 'USD',
+          to: 'EUR',
+        })
+      ).toThrow(ValidationError)
 
-      expect(() => validateConvertParams({
-        amount: 100,
-        from: 'INVALID',
-        to: 'EUR'
-      })).toThrow(InvalidCurrencyError)
+      expect(() =>
+        validateConvertParams({
+          amount: 100,
+          from: 'INVALID',
+          to: 'EUR',
+        })
+      ).toThrow(InvalidCurrencyError)
 
-      expect(() => validateConvertParams({
-        amount: 100,
-        from: 'USD',
-        to: 'USD'
-      })).toThrow(ValidationError)
+      expect(() =>
+        validateConvertParams({
+          amount: 100,
+          from: 'USD',
+          to: 'USD',
+        })
+      ).toThrow(ValidationError)
     })
   })
 
   describe('validateExchangeRatesParams', () => {
     it('should pass for valid parameters', () => {
-      expect(() => validateExchangeRatesParams({
-        base: 'USD',
-        codes: ['EUR', 'GBP']
-      })).not.toThrow()
+      expect(() =>
+        validateExchangeRatesParams({
+          base: 'USD',
+          codes: ['EUR', 'GBP'],
+        })
+      ).not.toThrow()
 
       expect(() => validateExchangeRatesParams()).not.toThrow()
     })
 
     it('should throw for invalid parameters', () => {
-      expect(() => validateExchangeRatesParams({
-        base: 'INVALID'
-      })).toThrow(InvalidCurrencyError)
+      expect(() =>
+        validateExchangeRatesParams({
+          base: 'INVALID',
+        })
+      ).toThrow(InvalidCurrencyError)
 
-      expect(() => validateExchangeRatesParams({
-        base: 'USD',
-        codes: ['INVALID']
-      })).toThrow(InvalidCurrencyError)
+      expect(() =>
+        validateExchangeRatesParams({
+          base: 'USD',
+          codes: ['INVALID'],
+        })
+      ).toThrow(InvalidCurrencyError)
     })
   })
 })

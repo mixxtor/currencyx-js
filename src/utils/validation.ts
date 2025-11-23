@@ -10,7 +10,7 @@ export function validateCurrencyCode(code: string): asserts code is CurrencyCode
     throw new ValidationError('Currency code must be a string')
   }
 
-  if (!CURRENCIES.some(c => c.code === code.toUpperCase())) {
+  if (!CURRENCIES.some((c) => c.code === code.toUpperCase())) {
     throw new InvalidCurrencyError(code)
   }
 }

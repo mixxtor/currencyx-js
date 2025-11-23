@@ -1,10 +1,10 @@
 /**
  * Currency Data
- * 
+ *
  * Contains basic currency information for common currencies
  */
 
-export type CurrencyInfo = typeof CURRENCIES[number]
+export type CurrencyInfo = (typeof CURRENCIES)[number]
 export type CurrencyCode = CurrencyInfo['code'] | (string & {})
 type CurrencySymbol = CurrencyInfo['symbol']
 export type CountryCode = CurrencyInfo['countries'][number] | (string & {})
@@ -219,7 +219,7 @@ export function getList(): CurrencyInfo[] {
  * Filter currencies by country
  */
 export function filterByCountry(iso2: CountryCode): CurrencyInfo[] {
-  return CURRENCIES.filter(c => c.countries.find(c => c === iso2.toUpperCase()))
+  return CURRENCIES.filter((c) => c.countries.find((c) => c === iso2.toUpperCase()))
 }
 
 /**
@@ -235,7 +235,7 @@ export function filterByName(name: string): CurrencyInfo[] {
  */
 export function getByCountry(iso2: CountryCode): CurrencyInfo | undefined
 export function getByCountry(iso2: string): CurrencyInfo | undefined {
-  return CURRENCIES.find((c) => c.countries.find(c => c === iso2.toUpperCase()))
+  return CURRENCIES.find((c) => c.countries.find((c) => c === iso2.toUpperCase()))
 }
 
 /**
