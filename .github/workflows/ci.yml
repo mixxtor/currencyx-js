@@ -31,7 +31,14 @@ jobs:
 
       - name: Install dependencies
         working-directory: packages/currencyx-js
-        run: npm ci
+        run: |
+          if [ -e yarn.lock ]; then
+            yarn install --frozen-lockfile
+          elif [ -e package-lock.json ]; then
+            npm ci
+          else
+            npm i
+          fi
 
       - name: Run linting
         working-directory: packages/currencyx-js
@@ -67,7 +74,14 @@ jobs:
 
       - name: Install dependencies
         working-directory: packages/currencyx-js
-        run: npm ci
+        run: |
+          if [ -e yarn.lock ]; then
+            yarn install --frozen-lockfile
+          elif [ -e package-lock.json ]; then
+            npm ci
+          else
+            npm i
+          fi
 
       - name: Build and check exports
         working-directory: packages/currencyx-js
