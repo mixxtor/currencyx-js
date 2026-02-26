@@ -4,9 +4,33 @@ All notable changes to this project will be documented in this file.
 
 
 
-## [2.2.5](///compare/v2.2.4...v2.2.5) (2025-12-15)
+## [2.2.6](https://github.com/mixxtor/currencyx-js/compare/v2.2.5...v2.2.6) (2026-02-26)
 
-## [2.2.4](///compare/v2.2.3...v2.2.4) (2025-11-23)
+### ♻️ Code Refactoring
+
+* remove package-lock & update github ci > test node versions (-18 & +24) ([c8f15db](https://github.com/mixxtor/currencyx-js/commit/c8f15dbe8491dfe1df738554097be5dd0ea2cc8e))
+* update dependency installation logic in CI workflows to support yarn and npm ([de967c1](https://github.com/mixxtor/currencyx-js/commit/de967c1f7c27c0833569a961558c1fdbff762620))
+* update GitHub CI to test Node.js versions 20, 22, and 24 ([03a162f](https://github.com/mixxtor/currencyx-js/commit/03a162fcd20609bdf3245531b242847ae43bd025))
+
+### 🔧 Maintenance
+
+* update dependencies ([f5f59d5](https://github.com/mixxtor/currencyx-js/commit/f5f59d58e8376332323c301ca04a373bfd75331b))
+
+## [2.2.5](https://github.com/mixxtor/currencyx-js/compare/v2.2.4...v2.2.5) (2025-12-15)
+
+### 🔧 Maintenance
+
+* chore: update devDependencies to latest versions (aceb65f)
+
+## [2.2.4](https://github.com/mixxtor/currencyx-js/compare/v2.2.3...v2.2.4) (2025-11-23)
+
+### ♻️ Code Refactoring
+
+* refactor: improve code readability and consistency (a36a7b8)
+
+### 🔧 Maintenance
+
+* chore: update dependencies (18fc160)
 
 ## [2.2.3](https://github.com/mixxtor/currencyx-js/compare/v2.2.2...v2.2.3) (2025-10-30)
 
