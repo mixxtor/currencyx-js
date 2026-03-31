@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 
 
+## [2.3.0](https://github.com/mixxtor/currencyx-js/compare/v2.2.6...v2.3.0) (2026-03-31)
+
+### ♻️ Code Refactoring
+
+* update project references from CurrencyX.js to CurrencyX & convert to not use cherrio & axios as dependencies ([15dbf5f](https://github.com/mixxtor/currencyx-js/commit/15dbf5f52ddb400c02ada3f58530b31839a820a5))
+
 ## [2.2.6](https://github.com/mixxtor/currencyx-js/compare/v2.2.5...v2.2.6) (2026-02-26)
 
 ### ♻️ Code Refactoring
