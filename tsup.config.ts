@@ -3,7 +3,11 @@ import { defineConfig } from 'tsup'
 export default defineConfig({
   entry: ['src/index.ts'],
   format: ['esm', 'cjs'],
-  dts: true,
+  dts: {
+    compilerOptions: {
+      ignoreDeprecations: '6.0',
+    },
+  },
   clean: true,
   sourcemap: true,
   outDir: 'dist',
@@ -14,6 +18,6 @@ export default defineConfig({
   external: [],
   noExternal: [],
   banner: {
-    js: '// CurrencyX.js - Modern TypeScript currency converter',
+    js: '// CurrencyX - Modern TypeScript currency converter',
   },
 })

@@ -1,4 +1,4 @@
-# CurrencyX.js
+# CurrencyX
 
 > Modern TypeScript currency converter with type inference and multiple exchanges. Framework agnostic with clean architecture and minimal dependencies.
 
@@ -384,7 +384,5 @@ See [CHANGELOG.md](./CHANGELOG.md) for version history and changes.
 <div align="center">
 
 **[Documentation](https://github.com/mixxtor/currencyx-js#readme)** • **[Examples](./examples)** • **[Issues](https://github.com/mixxtor/currencyx-js/issues)** • **[Contributing](./CONTRIBUTING.md)**
-
-Made with ❤️ by [Mixxtor](https://github.com/mixxtor)
 
 </div>

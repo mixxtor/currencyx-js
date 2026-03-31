@@ -1,6 +1,6 @@
 ---
 name: Bug Report
-about: Create a report to help us improve CurrencyX.js
+about: Create a report to help us improve CurrencyX
 title: '[BUG] '
 labels: 'bug'
 assignees: ''

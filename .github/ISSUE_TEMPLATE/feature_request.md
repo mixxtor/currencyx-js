@@ -1,6 +1,6 @@
 ---
 name: Feature Request
-about: Suggest an idea for CurrencyX.js
+about: Suggest an idea for CurrencyX
 title: '[FEATURE] '
 labels: 'enhancement'
 assignees: ''

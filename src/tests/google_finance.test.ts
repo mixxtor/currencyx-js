@@ -1,21 +1,31 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { GoogleFinanceExchange } from '../exchanges/google_finance.js'
+
+/**
+ * Helper to build a minimal Google Finance HTML response
+ */
+function buildGoogleFinanceHtml(from: string, to: string, rate: number): string {
+  return `<html><body><div data-source="${from}" data-target="${to}"><div>${rate}</div></div></body></html>`
+}
 
 describe('GoogleFinanceExchange', () => {
   let exchange: GoogleFinanceExchange
+  const originalFetch = globalThis.fetch
 
   beforeEach(() => {
     exchange = new GoogleFinanceExchange({ base: 'USD' })
-    // Mock fetch
-    global.fetch = vi.fn()
+  })
+
+  afterEach(() => {
+    globalThis.fetch = originalFetch
+    vi.restoreAllMocks()
   })
 
   it('should convert currency successfully', async () => {
-    // const mockResponse = {
-    //   ok: true,
-    //   json: () => Promise.resolve({ rate: 0.85 })
-    // }
-    // global.fetch = vi.fn().mockResolvedValue(mockResponse)
+    globalThis.fetch = vi.fn().mockResolvedValue({
+      ok: true,
+      text: () => Promise.resolve(buildGoogleFinanceHtml('USD', 'EUR', 0.85)),
+    })
 
     const result = await exchange.convert({
       amount: 100,
@@ -25,11 +35,15 @@ describe('GoogleFinanceExchange', () => {
 
     expect(result.success).toBe(true)
     expect(result.result).toBeLessThan(100)
-    expect(result.info?.rate).toBeLessThan(100)
+    expect(result.info?.rate).toBeLessThan(1)
   })
 
   it('should handle API errors gracefully', async () => {
-    // global.fetch = vi.fn().mockRejectedValue(new Error('API Error'))
+    globalThis.fetch = vi.fn().mockResolvedValue({
+      ok: false,
+      status: 404,
+      statusText: 'Not Found',
+    })
 
     const result = await exchange.convert({
       amount: 100,
@@ -42,13 +56,16 @@ describe('GoogleFinanceExchange', () => {
   })
 
   it('should get latest rates', async () => {
-    // const mockResponse = {
-    //   ok: true,
-    //   json: () => Promise.resolve({
-    //     rates: { EUR: 0.85, GBP: 0.73 }
-    //   })
-    // }
-    // global.fetch = vi.fn().mockResolvedValue(mockResponse)
+    globalThis.fetch = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        text: () => Promise.resolve(buildGoogleFinanceHtml('USD', 'EUR', 0.85)),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        text: () => Promise.resolve(buildGoogleFinanceHtml('USD', 'GBP', 0.73)),
+      })
 
     const result = await exchange.latestRates({
       base: 'USD',
@@ -60,15 +77,26 @@ describe('GoogleFinanceExchange', () => {
     expect(result.rates).toHaveProperty('GBP')
   })
 
-  //   it('should handle network timeouts', async () => {
-  //     global.fetch = vi.fn().mockRejectedValue(new Error('Timeout'))
+  it('should handle network timeouts', async () => {
+    globalThis.fetch = vi.fn().mockRejectedValue(new Error('The operation was aborted'))
 
-  //     const result = await exchange.latestRates({
-  //       base: 'USD',
-  //       codes: ['EUR']
-  //     })
+    const result = await exchange.latestRates({
+      base: 'USD',
+      codes: ['EUR'],
+    })
 
-  //     expect(result.success).toBe(false)
-  //     expect(result.error?.type).toBe('timeout_error')
-  //   })
+    expect(result.success).toBe(false)
+  })
+
+  it('should return same amount for same currency conversion', async () => {
+    const result = await exchange.convert({
+      amount: 100,
+      from: 'USD',
+      to: 'USD',
+    })
+
+    expect(result.success).toBe(true)
+    expect(result.result).toBe(100)
+    expect(result.info?.rate).toBe(1.0)
+  })
 })

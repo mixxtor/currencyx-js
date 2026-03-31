@@ -1,6 +1,6 @@
-# Contributing to CurrencyX.js
+# Contributing to CurrencyX
 
-Thank you for your interest in contributing to CurrencyX.js! 🎉
+Thank you for your interest in contributing to CurrencyX! 🎉
 
 ## 🚀 Getting Started
 
@@ -318,6 +318,6 @@ Contributors will be:
 
 ---
 
-**Thank you for contributing to CurrencyX.js! 🚀**
+**Thank you for contributing to CurrencyX! 🚀**
 
 Every contribution, no matter how small, makes a difference. We appreciate your time and effort in making this project better for everyone.

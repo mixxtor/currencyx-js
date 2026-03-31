@@ -57,7 +57,7 @@ export interface CurrencyExchangeContract {
    * @param {CurrencyCode} from - The currency code to convert from.
    * @param {CurrencyCode} to - The currency code to convert to. Defaults to 'USD'.
    */
-  getConvertRate(from: CurrencyCode, to: CurrencyCode, currencyList?: Record<string, any>[]): Promise<number | undefined>
+  getConvertRate(from: CurrencyCode, to: CurrencyCode, currencyList?: Record<string, unknown>[]): Promise<number | undefined>
 
   /**
    * Round currency value

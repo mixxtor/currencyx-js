@@ -1,5 +1,5 @@
 /**
- * CurrencyX.js Selective API Demo
+ * CurrencyX Selective API Demo
  *
  * Demonstrates the selective object-based parameter approach:
  * - Core methods (convert, getExchangeRates) use object parameters
@@ -18,7 +18,7 @@ async function main() {
     },
   })
 
-  console.log('🔄 CurrencyX.js Selective API Demo\n')
+  console.log('🔄 CurrencyX Selective API Demo\n')
 
   // ✅ Core methods use object parameters for clarity
   console.log('📊 Core Methods with Object Parameters:')
@@ -39,7 +39,7 @@ async function main() {
     // Get exchange rates with object parameters
     const rates = await currency.getExchangeRates({
       base: 'USD',
-      symbols: ['EUR', 'GBP', 'JPY'],
+      codes: ['EUR', 'GBP', 'JPY'],
     })
 
     if (rates.success) {
@@ -52,27 +52,15 @@ async function main() {
     console.log('⚠️  API calls failed (expected in demo without real API keys)')
   }
 
-  console.log('\n🔄 Backward Compatibility:')
-
-  try {
-    // Backward compatibility methods still available
-    const legacyConversion = await currency.convertAmount(100, 'USD', 'EUR')
-    const legacyRates = await currency.getRates('USD', ['EUR', 'GBP'])
-
-    console.log('✅ Legacy methods work identically')
-  } catch (error) {
-    console.log('⚠️  Legacy API calls failed (expected in demo)')
-  }
-
   // ✅ Simple methods keep positional parameters
   console.log('\n🎯 Simple Methods with Positional Parameters:')
 
   // Provider switching - simple and clear
   currency.use('google')
-  console.log(`🔧 Current provider: ${currency.getCurrentProvider()}`)
+  console.log(`🔧 Current exchange provider: ${currency.getCurrentExchange()}`)
 
-  // Available providers
-  const providers = currency.getAvailableProviders()
+  // Available exchange providers
+  const providers = currency.getAvailableExchanges()
   console.log(`📋 Available providers: ${providers.join(', ')}`)
 
   // Utility methods
@@ -80,7 +68,7 @@ async function main() {
   console.log(`🔢 Rounded value: ${rounded}`)
 
   // Currency formatting
-  const formatted = currency.formatCurrency(1234.56, 'USD', 'en-US')
+  const formatted = currency.formatCurrency({ amount: 1234.56, code: 'USD', locale: 'en-US' })
   console.log(`💰 Formatted: ${formatted}`)
 
   console.log('\n✨ Benefits of Selective Approach:')

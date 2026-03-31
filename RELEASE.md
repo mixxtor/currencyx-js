@@ -1,6 +1,6 @@
 # Release Process
 
-This document describes the automated release process for CurrencyX.js.
+This document describes the automated release process for CurrencyX.
 
 ## 🚀 Automated Release System
 

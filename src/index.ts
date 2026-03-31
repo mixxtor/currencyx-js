@@ -1,5 +1,5 @@
 /**
- * CurrencyX.js
+ * CurrencyX
  *
  * Modern TypeScript currency converter with type inference
  * Fresh, clean, and optimized implementation
