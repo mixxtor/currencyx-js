@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 
 
+## [2.3.1](https://github.com/mixxtor/currencyx-js/compare/v2.3.0...v2.3.1) (2026-07-02)
+
+### 🔧 Maintenance
+
+* **deps-dev:** bump @release-it/conventional-changelog ([19dd873](https://github.com/mixxtor/currencyx-js/commit/19dd8733f628400aaadf72b60407f4094b78eea9))
+* **deps-dev:** bump release-it from 19.2.4 to 20.2.0 ([d3dc1d0](https://github.com/mixxtor/currencyx-js/commit/d3dc1d09c2cb8e3a2ff49351ca80dd08a3fb80b1))
+* update dependencies and improve code formatting ([f1e6b27](https://github.com/mixxtor/currencyx-js/commit/f1e6b27d7db27e74a3c1f1f7ed4b29f50a659728))
+
 ## [2.3.0](https://github.com/mixxtor/currencyx-js/compare/v2.2.6...v2.3.0) (2026-03-31)
 
 ### ♻️ Code Refactoring
