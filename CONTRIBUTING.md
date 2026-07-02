@@ -122,9 +122,7 @@ interface CurrencyConfig {
 }
 
 // ❌ Avoid
-const config: any = {
-  /* ... */
-}
+const config: any = {/* ... */}
 ```
 
 ### Naming Conventions

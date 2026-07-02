@@ -131,15 +131,9 @@ export class GoogleFinanceExchange extends BaseCurrencyExchange {
     try {
       const patterns = [
         // Pattern: data-source/data-target div with first child text content
-        new RegExp(
-          `data-source="${from}"[^>]*data-target="${to}"[^>]*>\\s*<[^>]*>([0-9][0-9,]*\\.?[0-9]*)`,
-          'i'
-        ),
+        new RegExp(`data-source="${from}"[^>]*data-target="${to}"[^>]*>\\s*<[^>]*>([0-9][0-9,]*\\.?[0-9]*)`, 'i'),
         // Pattern for data-source and data-target attributes (deeper nesting)
-        new RegExp(
-          `data-source="${from}"[^>]*data-target="${to}"[^>]*>([^<]*<[^>]*>)*([0-9,]+\\.?[0-9]*)`,
-          'i'
-        ),
+        new RegExp(`data-source="${from}"[^>]*data-target="${to}"[^>]*>([^<]*<[^>]*>)*([0-9,]+\\.?[0-9]*)`, 'i'),
         // Pattern for currency pair in title or aria-label
         new RegExp(`${from}\\s*-\\s*${to}[^0-9]*([0-9,]+\\.?[0-9]*)`, 'i'),
         // Pattern for rate value in common Google Finance structure
