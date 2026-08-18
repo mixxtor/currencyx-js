@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 
 
+## [2.4.0](https://github.com/mixxtor/currencyx-js/compare/v2.3.1...v2.4.0) (2026-08-18)
+
+### ✨ Features
+
+* scope latestRates({ base }) per call, add get()/has() ([6b8a752](https://github.com/mixxtor/currencyx-js/commit/6b8a75299cac8d0a7c1efbf10681b02c1b07cdd8))
+
+### 🔧 Maintenance
+
+* update devDependencies to latest versions ([06a91c2](https://github.com/mixxtor/currencyx-js/commit/06a91c23e349c28f535edf0bae8ab9212d6714d4))
+
 ## [2.3.1](https://github.com/mixxtor/currencyx-js/compare/v2.3.0...v2.3.1) (2026-07-02)
 
 ### 🔧 Maintenance
