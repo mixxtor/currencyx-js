@@ -68,16 +68,16 @@ export class CurrencyService<KnownExchanges extends Record<string, BaseCurrencyE
 
   /**
    * Get exchange rates
+   *
+   * `params.base` is forwarded to the exchange and NOT written onto it. It used to call
+   * `exchange.setBase(params.base)` first, which is a permanent assignment on an object the
+   * manager keeps for the lifetime of the process: one `latestRates({ base: 'JPY' })` silently
+   * turned every later base-less call — in any other request — into a JPY-based one. Exchanges
+   * resolve the per-call base through `resolveBase(params)`; `setBase()` remains the way to change
+   * an exchange's own default.
    */
   async getExchangeRates(params?: ExchangeRatesParams): Promise<ExchangeRatesResult> {
-    const exchange = this.#getActiveExchange()
-
-    // Set base currency if provided
-    if (params?.base) {
-      exchange.setBase(params.base)
-    }
-
-    return await exchange.latestRates(params)
+    return await this.#getActiveExchange().latestRates(params)
   }
 
   async latestRates(params?: ExchangeRatesParams): Promise<ExchangeRatesResult> {
@@ -98,6 +98,29 @@ export class CurrencyService<KnownExchanges extends Record<string, BaseCurrencyE
     }
     this.#currentExchangeName = exchangeName
     return this.#exchanges.get(exchangeName as keyof KnownExchanges) as KnownExchanges[ExchangeName]
+  }
+
+  /**
+   * Read a configured exchange **without** switching the active one.
+   *
+   * `use()` doubles as a setter — it reassigns the active exchange for every later call on the
+   * service — which is the wrong tool for "just give me that exchange for a second".
+   */
+  get<ExchangeName extends keyof KnownExchanges>(exchange: ExchangeName): KnownExchanges[ExchangeName] {
+    const instance = this.#exchanges.get(exchange)
+    if (!instance) {
+      throw new Error(`Exchange '${exchange?.toString()}' is not configured`)
+    }
+
+    return instance as KnownExchanges[ExchangeName]
+  }
+
+  /**
+   * Whether an exchange name is configured. Pairs with `getAvailableExchanges()` for user-land code
+   * that offers a choice of exchanges instead of hard-coding the list.
+   */
+  has(exchange: PropertyKey): exchange is keyof KnownExchanges {
+    return this.#exchanges.has(exchange as keyof KnownExchanges)
   }
 
   /**

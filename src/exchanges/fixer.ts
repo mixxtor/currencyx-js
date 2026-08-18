@@ -72,10 +72,11 @@ export class FixerExchange extends BaseCurrencyExchange {
    */
   async latestRates(params?: ExchangeRatesParams): Promise<ExchangeRatesResult> {
     const codes = params?.codes || this.currencies
+    const base = this.resolveBase(params)
     try {
       const url = new URL(`${this.baseUrl}/latest`)
       url.searchParams.set('access_key', this.accessKey)
-      url.searchParams.set('base', this.base)
+      url.searchParams.set('base', base)
 
       if (codes && codes.length > 0) {
         url.searchParams.set('symbols', codes.join(','))
@@ -93,7 +94,7 @@ export class FixerExchange extends BaseCurrencyExchange {
 
       if (!data.success) {
         return this.createExchangeRatesResult(
-          this.base,
+          base,
           {},
           {
             code: data.error?.code,
@@ -103,10 +104,10 @@ export class FixerExchange extends BaseCurrencyExchange {
         )
       }
 
-      return this.createExchangeRatesResult(this.base, data.rates || {})
+      return this.createExchangeRatesResult(base, data.rates || {})
     } catch (error) {
       return this.createExchangeRatesResult(
-        this.base,
+        base,
         {},
         {
           info: error instanceof Error ? error.message : 'Failed to fetch exchange rates',

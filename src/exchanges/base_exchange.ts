@@ -30,6 +30,19 @@ export abstract class BaseCurrencyExchange implements CurrencyExchangeContract {
   }
 
   /**
+   * Base a single call should run against: the one passed in `params`, falling back to the
+   * exchange's configured base.
+   *
+   * Exchanges are long-lived singletons (the manager builds one per configured name and hands the
+   * same object to every caller), so a per-call base must never be applied by assigning to
+   * `this.base`. Doing that leaked one caller's `latestRates({ base })` into every later call that
+   * passed no base at all.
+   */
+  protected resolveBase(params?: ExchangeRatesParams): CurrencyCode {
+    return params?.base ?? this.base
+  }
+
+  /**
    * Get all constant currencies
    */
   getList() {

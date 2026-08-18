@@ -110,15 +110,27 @@ const rates = await currency.latestRates({ base: 'USD', codes: ['EUR', 'GBP'] })
 ### Exchange Management
 
 ```typescript
-// Switch exchanges
+// Switch exchanges — `use()` also returns the instance
 currency.use('fixer')
+
+// Read one without switching the active exchange
+const fixer = currency.get('fixer')
 
 // Get current exchange provider
 const current = currency.getCurrentExchange() // 'fixer'
 
 // List available exchanges
 const exchanges = currency.getAvailableExchanges() // ['google', 'fixer']
+
+// Narrow an unknown string to a configured exchange name
+if (currency.has(name)) {
+  currency.use(name)
+}
 ```
+
+> `latestRates({ base })` applies that base to the one call only. Exchange instances are shared, so
+> to change an exchange's own default use `currency.get('fixer').setBase('EUR')`.
+
 
 ### Utility Methods
 
@@ -281,6 +293,14 @@ class CustomExchange extends BaseCurrencyExchange {
     super()
     this.base = config.base || 'USD'
     // Initialize with your config
+  }
+
+  // Resolve the base per call — `this.base` is the instance default, `params.base` overrides it
+  // for that call only. Never assign to `this.base` inside a request path: the instance is shared.
+  async latestRates(params?: ExchangeRatesParams) {
+    const base = this.resolveBase(params)
+    // ... fetch, then:
+    return this.createExchangeRatesResult(base, rates)
   }
 
   async convert(params: ConvertParams) {

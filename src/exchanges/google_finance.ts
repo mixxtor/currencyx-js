@@ -30,24 +30,25 @@ export class GoogleFinanceExchange extends BaseCurrencyExchange {
   async latestRates(params?: ExchangeRatesParams): Promise<ExchangeRatesResult> {
     const rates: Record<string, number> = {}
     const currenciesToFetch = params?.codes || this.currencies
+    const base = this.resolveBase(params)
 
     try {
       for (const code of currenciesToFetch) {
-        if (code === this.base) {
+        if (code === base) {
           rates[code] = 1.0
           continue
         }
 
-        const rate = await this.#getRate(this.base, code)
+        const rate = await this.#getRate(base, code)
         if (rate) {
           rates[code] = rate
         }
       }
 
-      return this.createExchangeRatesResult(this.base, rates)
+      return this.createExchangeRatesResult(base, rates)
     } catch (error) {
       return this.createExchangeRatesResult(
-        this.base,
+        base,
         {},
         {
           info: error instanceof Error ? error.message : 'Failed to fetch exchange rates',
