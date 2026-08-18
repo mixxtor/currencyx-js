@@ -17,6 +17,7 @@ export type {
   FixerConfig,
   CurrencyConfig,
   CurrencyExchanges,
+  CurrencyExchangeInstance,
   InferExchanges,
 } from './types/index.js'
 
@@ -24,13 +25,32 @@ export type {
 export type { CurrencyExchangeContract } from './contracts/currency_exchange.js'
 
 // Exchanges
-export { BaseCurrencyExchange, GoogleFinanceExchange, FixerExchange } from './exchanges/index.js'
+export { BaseCurrencyExchange, GoogleFinanceExchange, FixerExchange, createExchange } from './exchanges/index.js'
+export type {
+  ExchangeSpec,
+  SpecExchange,
+  ExchangeCallContext,
+  FetchRatesContext,
+  FetchRateContext,
+  ConvertContext,
+} from './exchanges/index.js'
 
 // Services
 export { CurrencyService } from './services/index.js'
 
 // Configuration
 export { defineConfig, exchanges } from './config/index.js'
+
+// Errors — throw these from a spec callback to surface a typed failure
+export {
+  CurrencyError,
+  ApiError,
+  RateLimitError,
+  ValidationError,
+  InvalidCurrencyError,
+  ConfigurationError,
+  TimeoutError,
+} from './errors.js'
 
 // Factory
 export { createCurrency } from './factory.js'

@@ -1,16 +1,22 @@
 /**
  * Fixer.io Exchange
+ *
+ * Written on `createExchange()`: the request and the two response shapes below are all this file
+ * needs to describe. Cross rates, base handling, code filtering, result objects and error mapping
+ * come from the generated class.
  */
 
-import type {
-  CurrencyCode,
-  ConversionResult,
-  ExchangeRatesResult,
-  FixerConfig,
-  ExchangeRatesParams,
-  ConvertParams,
-} from '../types/index.js'
-import { BaseCurrencyExchange } from './base_exchange.js'
+import type { CurrencyCode, FixerConfig } from '../types/index.js'
+import { CurrencyError } from '../errors.js'
+import { createExchange } from './create_exchange.js'
+
+const BASE_URL = 'http://data.fixer.io/api'
+
+interface FixerError {
+  code: number
+  info: string
+  type: string
+}
 
 interface FixerResponse {
   success: boolean
@@ -18,182 +24,72 @@ interface FixerResponse {
   base?: string
   date?: string
   rates?: Record<string, number>
-  error?: {
-    code: number
-    info: string
-    type: string
-  }
+  error?: FixerError
 }
 
 interface FixerConvertResponse {
   success: boolean
-  query?: {
-    from: string
-    to: string
-    amount: number
-  }
-  info?: {
-    timestamp: number
-    rate: number
-  }
+  query?: { from: string; to: string; amount: number }
+  info?: { timestamp: number; rate: number }
   date?: string
   result?: number
-  error?: {
-    code: number
-    info: string
-    type: string
+  error?: FixerError
+}
+
+/**
+ * Fixer answers a failure with HTTP 200 and `success: false`, so both paths have to be checked.
+ */
+function assertOk(response: Response, data: { success: boolean; error?: FixerError }): void {
+  if (!response.ok) {
+    throw new CurrencyError(`HTTP ${response.status}: ${response.statusText}`, response.status, 'API_ERROR')
+  }
+
+  if (!data.success) {
+    throw new CurrencyError(
+      data.error?.info || 'Unknown error from Fixer.io',
+      data.error?.code ?? 500,
+      data.error?.type || 'API_ERROR',
+    )
   }
 }
 
-export class FixerExchange extends BaseCurrencyExchange {
-  readonly name = 'fixer'
+export class FixerExchange extends createExchange<FixerConfig>({
+  name: 'fixer',
+  // Fixer.io's own default base, kept as the class default for a bare `new FixerExchange(...)`.
+  defaults: {
+    base: 'EUR' as CurrencyCode,
+    timeout: 5000,
+  } as Partial<FixerConfig>,
 
-  private baseUrl = 'http://data.fixer.io/api'
-  private accessKey: string
-  private timeout: number
+  setKey: (config, key) => {
+    config.accessKey = key
+  },
 
-  constructor(config: FixerConfig) {
-    super()
-    this.accessKey = config.accessKey
-    this.base = config.base || 'EUR' // Fixer.io default base is EUR
-    this.timeout = config.timeout || 5000
-  }
+  async fetchRates({ config, base, codes, currencies, signal }) {
+    const url = new URL(`${BASE_URL}/latest`)
+    url.searchParams.set('access_key', config.accessKey)
+    url.searchParams.set('base', base)
+    url.searchParams.set('symbols', (codes ?? currencies).join(','))
 
-  /**
-   * Set API key
-   */
-  setKey(key: string): this {
-    this.accessKey = key
-    return this
-  }
+    const response = await fetch(url.toString(), { signal })
+    const data = (await response.json()) as FixerResponse
+    assertOk(response, data)
 
-  /**
-   * Get latest exchange rates
-   */
-  async latestRates(params?: ExchangeRatesParams): Promise<ExchangeRatesResult> {
-    const codes = params?.codes || this.currencies
-    const base = this.resolveBase(params)
-    try {
-      const url = new URL(`${this.baseUrl}/latest`)
-      url.searchParams.set('access_key', this.accessKey)
-      url.searchParams.set('base', base)
+    return data.rates || {}
+  },
 
-      if (codes && codes.length > 0) {
-        url.searchParams.set('symbols', codes.join(','))
-      }
+  /** Fixer has a conversion endpoint, so a conversion is one request rather than a rate table. */
+  async convert({ config, from, to, amount, signal }) {
+    const url = new URL(`${BASE_URL}/convert`)
+    url.searchParams.set('access_key', config.accessKey)
+    url.searchParams.set('from', from)
+    url.searchParams.set('to', to)
+    url.searchParams.set('amount', amount.toString())
 
-      const response = await fetch(url.toString(), {
-        signal: AbortSignal.timeout(this.timeout),
-      })
+    const response = await fetch(url.toString(), { signal })
+    const data = (await response.json()) as FixerConvertResponse
+    assertOk(response, data)
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-      }
-
-      const data: FixerResponse = await response.json()
-
-      if (!data.success) {
-        return this.createExchangeRatesResult(
-          base,
-          {},
-          {
-            code: data.error?.code,
-            info: data.error?.info || 'Unknown error from Fixer.io',
-            type: data.error?.type || 'API_ERROR',
-          }
-        )
-      }
-
-      return this.createExchangeRatesResult(base, data.rates || {})
-    } catch (error) {
-      return this.createExchangeRatesResult(
-        base,
-        {},
-        {
-          info: error instanceof Error ? error.message : 'Failed to fetch exchange rates',
-          type: 'FETCH_ERROR',
-        }
-      )
-    }
-  }
-
-  /**
-   * Convert currency amount
-   */
-  async convert(params: ConvertParams): Promise<ConversionResult> {
-    const { amount, from, to } = params
-    try {
-      if (from === to) {
-        return this.createConversionResult(amount, from, to, amount, 1.0)
-      }
-
-      const url = new URL(`${this.baseUrl}/convert`)
-      url.searchParams.set('access_key', this.accessKey)
-      url.searchParams.set('from', from)
-      url.searchParams.set('to', to)
-      url.searchParams.set('amount', amount.toString())
-
-      const response = await fetch(url.toString(), {
-        signal: AbortSignal.timeout(this.timeout),
-      })
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
-      }
-
-      const data: FixerConvertResponse = await response.json()
-
-      if (!data.success) {
-        return this.createConversionResult(amount, from, to, undefined, undefined, {
-          code: data.error?.code,
-          info: data.error?.info || 'Unknown error from Fixer.io',
-          type: data.error?.type || 'API_ERROR',
-        })
-      }
-
-      return this.createConversionResult(amount, from, to, data.result, data.info?.rate)
-    } catch (error) {
-      return this.createConversionResult(amount, from, to, undefined, undefined, {
-        info: error instanceof Error ? error.message : 'Conversion failed',
-        type: 'CONVERSION_ERROR',
-      })
-    }
-  }
-
-  /**
-   * Get conversion rate between two currencies
-   */
-  async getConvertRate(from: CurrencyCode, to: CurrencyCode): Promise<number | undefined> {
-    try {
-      if (from === to) {
-        return 1.0
-      }
-
-      // If one of the currencies is the base currency, we can use latest rates
-      if (from === this.base) {
-        const rates = await this.latestRates({ codes: [to] })
-        return rates.rates[to]
-      }
-
-      if (to === this.base) {
-        const rates = await this.latestRates({ codes: [from] })
-        const rate = rates.rates[from]
-        return rate ? 1 / rate : undefined
-      }
-
-      // For cross-currency conversion, get both rates against base
-      const rates = await this.latestRates({ codes: [from, to] })
-      const fromRate = rates.rates[from]
-      const toRate = rates.rates[to]
-
-      if (fromRate && toRate) {
-        return toRate / fromRate
-      }
-
-      return undefined
-    } catch (error) {
-      console.error(`Fixer: Failed to get conversion rate for ${from}-${to}:`, error)
-      return undefined
-    }
-  }
-}
+    return { result: data.result as number, rate: data.info?.rate }
+  },
+}) {}

@@ -85,9 +85,23 @@ export interface FixerConfig extends BaseConfig {
 export interface CurrencyExchanges {}
 
 /**
+ * The public surface of an exchange: everything `BaseCurrencyExchange` exposes, with `abstract` and
+ * the protected helpers mapped away.
+ *
+ * This — not the class type — is what configuration and registration accept. A class built by
+ * `createExchange()` reports this shape (mapping is what makes it concrete, so `class X extends
+ * createExchange({...}) {}` does not have to reimplement the three methods), and a hand-written
+ * subclass satisfies it too. Constraining to the class itself would have made the two kinds of
+ * exchange incompatible with each other.
+ */
+export type CurrencyExchangeInstance = {
+  [K in keyof BaseCurrencyExchange]: BaseCurrencyExchange[K]
+}
+
+/**
  * Main currency configuration interface
  */
-export interface CurrencyConfig<KnownExchanges extends Record<keyof CurrencyExchanges, BaseCurrencyExchange>> {
+export interface CurrencyConfig<KnownExchanges extends Record<keyof CurrencyExchanges, CurrencyExchangeInstance>> {
   /** Default provider to use for currency operations */
   default: keyof KnownExchanges
   /** Available currency exchanges configuration */

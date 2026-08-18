@@ -1,110 +1,69 @@
 /**
  * Google Finance Exchange
+ *
+ * Written on `createExchange()` in **pair mode**: Google quotes one pair per page, so the only
+ * thing this file describes is "fetch and scrape one rate". Walking the code list for
+ * `latestRates`, short-circuiting `from === to`, and building results is the generated class's job.
  */
 
-import type {
-  CurrencyCode,
-  ConversionResult,
-  ExchangeRatesResult,
-  GoogleFinanceConfig,
-  ExchangeRatesParams,
-  ConvertParams,
-} from '../types/index.js'
-import { BaseCurrencyExchange } from './base_exchange.js'
+import type { CurrencyCode, GoogleFinanceConfig } from '../types/index.js'
+import { createExchange } from './create_exchange.js'
 
-export class GoogleFinanceExchange extends BaseCurrencyExchange {
-  readonly name = 'google'
+const BASE_URL = 'https://www.google.com/finance'
+const USER_AGENT =
+  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'
 
-  private baseUrl = 'https://www.google.com/finance'
-  private timeout: number
+/**
+ * Parse exchange rate from Google Finance HTML
+ */
+function parseRateFromHtml(html: string, from: CurrencyCode, to: CurrencyCode): number | undefined {
+  try {
+    const patterns = [
+      // Pattern: data-source/data-target div with first child text content
+      new RegExp(`data-source="${from}"[^>]*data-target="${to}"[^>]*>\\s*<[^>]*>([0-9][0-9,]*\\.?[0-9]*)`, 'i'),
+      // Pattern for data-source and data-target attributes (deeper nesting)
+      new RegExp(`data-source="${from}"[^>]*data-target="${to}"[^>]*>([^<]*<[^>]*>)*([0-9,]+\\.?[0-9]*)`, 'i'),
+      // Pattern for currency pair in title or aria-label
+      new RegExp(`${from}\\s*-\\s*${to}[^0-9]*([0-9,]+\\.?[0-9]*)`, 'i'),
+      // Pattern for rate value in common Google Finance structure
+      new RegExp(`"${from}-${to}"[^}]*"price"[^:]*:[^"]*"([0-9,]+\\.?[0-9]*)"`, 'i'),
+      // Fallback pattern for any number after currency pair
+      new RegExp(`${from}/${to}[^0-9]*([0-9,]+\\.?[0-9]*)`, 'i'),
+    ]
 
-  constructor(config: GoogleFinanceConfig = {}) {
-    super()
-    this.base = config.base || 'USD'
-    this.timeout = config.timeout || 5000
-  }
-
-  /**
-   * Get latest exchange rates
-   */
-  async latestRates(params?: ExchangeRatesParams): Promise<ExchangeRatesResult> {
-    const rates: Record<string, number> = {}
-    const currenciesToFetch = params?.codes || this.currencies
-    const base = this.resolveBase(params)
-
-    try {
-      for (const code of currenciesToFetch) {
-        if (code === base) {
-          rates[code] = 1.0
-          continue
-        }
-
-        const rate = await this.#getRate(base, code)
-        if (rate) {
-          rates[code] = rate
+    for (const pattern of patterns) {
+      const match = html.match(pattern)
+      // Try the last captured group first (group 2 if exists, else group 1)
+      const rateString = match?.[2] ?? match?.[1]
+      if (rateString) {
+        const cleaned = rateString.replace(/,/g, '')
+        const rate = parseFloat(cleaned)
+        if (!isNaN(rate) && rate > 0) {
+          return rate
         }
       }
-
-      return this.createExchangeRatesResult(base, rates)
-    } catch (error) {
-      return this.createExchangeRatesResult(
-        base,
-        {},
-        {
-          info: error instanceof Error ? error.message : 'Failed to fetch exchange rates',
-          type: 'FETCH_ERROR',
-        }
-      )
     }
+
+    return undefined
+  } catch (error) {
+    console.error('Error parsing rate from HTML:', error)
+    return undefined
   }
+}
+
+export class GoogleFinanceExchange extends createExchange<GoogleFinanceConfig>({
+  name: 'google',
+  defaults: { base: 'USD' as CurrencyCode, timeout: 5000 },
 
   /**
-   * Convert currency amount
+   * Scraping is best-effort: a miss returns `undefined` (the code drops out of the table) rather
+   * than throwing, which is what keeps one unavailable pair from failing a whole `latestRates`.
    */
-  async convert(params: ConvertParams): Promise<ConversionResult> {
-    const { amount, from, to } = params
+  async fetchRate({ from, to, signal }) {
     try {
-      if (from === to) {
-        return this.createConversionResult(amount, from, to, amount, 1.0)
-      }
-
-      const rate = await this.#getRate(from, to)
-      if (!rate) {
-        return this.createConversionResult(amount, from, to, undefined, undefined, {
-          info: `Failed to get exchange rate for ${from}-${to}`,
-          type: 'RATE_NOT_FOUND',
-        })
-      }
-
-      const result = rate * amount
-      return this.createConversionResult(amount, from, to, result, rate)
-    } catch (error) {
-      return this.createConversionResult(amount, from, to, undefined, undefined, {
-        info: error instanceof Error ? error.message : 'Conversion failed',
-        type: 'CONVERSION_ERROR',
-      })
-    }
-  }
-
-  /**
-   * Get conversion rate between two currencies
-   */
-  async getConvertRate(from: CurrencyCode, to: CurrencyCode): Promise<number | undefined> {
-    return await this.#getRate(from, to)
-  }
-
-  /**
-   * Get exchange rate from Google Finance
-   */
-  async #getRate(from: CurrencyCode, to: CurrencyCode): Promise<number | undefined> {
-    try {
-      const url = `${this.baseUrl}/quote/${from}-${to}`
-      const userAgent =
-        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/68.0.3440.106 Safari/537.36'
-
-      const response = await fetch(url, {
-        headers: { 'User-Agent': userAgent },
-        signal: AbortSignal.timeout(this.timeout),
+      const response = await fetch(`${BASE_URL}/quote/${from}-${to}`, {
+        headers: { 'User-Agent': USER_AGENT },
+        signal,
       })
 
       if (!response.ok) {
@@ -112,54 +71,16 @@ export class GoogleFinanceExchange extends BaseCurrencyExchange {
         return undefined
       }
 
-      const html = await response.text()
-      const rate = this.#parseRateFromHtml(html, from, to)
-
+      const rate = parseRateFromHtml(await response.text(), from, to)
       if (rate && !isNaN(rate)) {
         return rate
-      } else {
-        console.error(`Google Finance: Failed to get ${from}-${to} rate.`)
       }
+
+      console.error(`Google Finance: Failed to get ${from}-${to} rate.`)
+      return undefined
     } catch (error) {
       console.error(error)
-    }
-  }
-
-  /**
-   * Parse exchange rate from Google Finance HTML
-   */
-  #parseRateFromHtml(html: string, from: CurrencyCode, to: CurrencyCode): number | undefined {
-    try {
-      const patterns = [
-        // Pattern: data-source/data-target div with first child text content
-        new RegExp(`data-source="${from}"[^>]*data-target="${to}"[^>]*>\\s*<[^>]*>([0-9][0-9,]*\\.?[0-9]*)`, 'i'),
-        // Pattern for data-source and data-target attributes (deeper nesting)
-        new RegExp(`data-source="${from}"[^>]*data-target="${to}"[^>]*>([^<]*<[^>]*>)*([0-9,]+\\.?[0-9]*)`, 'i'),
-        // Pattern for currency pair in title or aria-label
-        new RegExp(`${from}\\s*-\\s*${to}[^0-9]*([0-9,]+\\.?[0-9]*)`, 'i'),
-        // Pattern for rate value in common Google Finance structure
-        new RegExp(`"${from}-${to}"[^}]*"price"[^:]*:[^"]*"([0-9,]+\\.?[0-9]*)"`, 'i'),
-        // Fallback pattern for any number after currency pair
-        new RegExp(`${from}/${to}[^0-9]*([0-9,]+\\.?[0-9]*)`, 'i'),
-      ]
-
-      for (const pattern of patterns) {
-        const match = html.match(pattern)
-        // Try the last captured group first (group 2 if exists, else group 1)
-        const rateString = match?.[2] ?? match?.[1]
-        if (rateString) {
-          const cleaned = rateString.replace(/,/g, '')
-          const rate = parseFloat(cleaned)
-          if (!isNaN(rate) && rate > 0) {
-            return rate
-          }
-        }
-      }
-
-      return undefined
-    } catch (error) {
-      console.error('Error parsing rate from HTML:', error)
       return undefined
     }
-  }
-}
+  },
+}) {}
