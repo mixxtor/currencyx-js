@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 
 
+## [2.5.0](https://github.com/mixxtor/currencyx-js/compare/v2.4.0...v2.5.0) (2026-08-18)
+
+### ✨ Features
+
+* author exchanges from a spec with createExchange ([a80fc61](https://github.com/mixxtor/currencyx-js/commit/a80fc613831109bbaf339600f2f6512d6d0bccf9))
+
 ## [2.4.0](https://github.com/mixxtor/currencyx-js/compare/v2.3.1...v2.4.0) (2026-08-18)
 
 ### ✨ Features
