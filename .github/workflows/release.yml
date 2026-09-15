@@ -55,7 +55,7 @@ jobs:
 
       - name: Release (Auto)
         if: github.event_name == 'push'
-        run: npm run release:patch --registry=https://npmjs.org
+        run: npm run release:patch
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -63,7 +63,7 @@ jobs:
 
       - name: Release (Manual)
         if: github.event_name == 'workflow_dispatch'
-        run: npm run release:${{ github.event.inputs.release_type }} --registry=https://npmjs.org
+        run: npm run release:${{ github.event.inputs.release_type }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
