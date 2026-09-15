@@ -35,17 +35,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          registry-url: 'https://npmjs.org'
 
       - name: Install dependencies
-        run: |
-          if [ -e yarn.lock ]; then
-            yarn install --frozen-lockfile
-          elif [ -e package-lock.json ]; then
-            npm ci
-          else
-            npm i
-          fi
+        run: npm i
 
       - name: Run tests
         run: |
@@ -59,11 +51,11 @@ jobs:
       - name: Configure Git
         run: |
           git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@://github.com"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Release (Auto)
         if: github.event_name == 'push'
-        run: npm run release:patch
+        run: npm run release:patch --registry=https://npmjs.org
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -71,7 +63,7 @@ jobs:
 
       - name: Release (Manual)
         if: github.event_name == 'workflow_dispatch'
-        run: npm run release:${{ github.event.inputs.release_type }}
+        run: npm run release:${{ github.event.inputs.release_type }} --registry=https://npmjs.org
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
