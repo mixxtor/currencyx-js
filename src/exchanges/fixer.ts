@@ -10,7 +10,16 @@ import type { CurrencyCode, FixerConfig } from '../types/index.js'
 import { CurrencyError } from '../errors.js'
 import { createExchange } from './create_exchange.js'
 
-const BASE_URL = 'http://data.fixer.io/api'
+/**
+ * Plain HTTP by default because Fixer's free plan does not include HTTPS. Paid plans should set
+ * `baseUrl: 'https://data.fixer.io/api'`: over HTTP the `access_key` travels in clear text on every
+ * request.
+ */
+const DEFAULT_BASE_URL = 'http://data.fixer.io/api'
+
+function baseUrl(config: FixerConfig): string {
+  return (config.baseUrl ?? DEFAULT_BASE_URL).replace(/\/+$/, '')
+}
 
 interface FixerError {
   code: number
@@ -61,12 +70,18 @@ export class FixerExchange extends createExchange<FixerConfig>({
     timeout: 5000,
   } as Partial<FixerConfig>,
 
+  // Fixer only honours `base` on paid plans; the free plan rejects anything but EUR with
+  // `base_currency_access_restricted`. Asking for EUR always and deriving every other base locally
+  // works on every plan, costs the same single request, and is what the `base` option promised —
+  // before this, `exchanges.fixer({ base: 'USD' })` on a free key returned no rates at all.
+  upstream: { base: 'EUR' as CurrencyCode },
+
   setKey: (config, key) => {
     config.accessKey = key
   },
 
   async fetchRates({ config, base, codes, currencies, signal }) {
-    const url = new URL(`${BASE_URL}/latest`)
+    const url = new URL(`${baseUrl(config)}/latest`)
     url.searchParams.set('access_key', config.accessKey)
     url.searchParams.set('base', base)
     url.searchParams.set('symbols', (codes ?? currencies).join(','))
@@ -80,7 +95,7 @@ export class FixerExchange extends createExchange<FixerConfig>({
 
   /** Fixer has a conversion endpoint, so a conversion is one request rather than a rate table. */
   async convert({ config, from, to, amount, signal }) {
-    const url = new URL(`${BASE_URL}/convert`)
+    const url = new URL(`${baseUrl(config)}/convert`)
     url.searchParams.set('access_key', config.accessKey)
     url.searchParams.set('from', from)
     url.searchParams.set('to', to)

@@ -215,10 +215,17 @@ const currency = createCurrency({
       accessKey: 'your-api-key', // Required: Your Fixer.io API key
       base: 'USD', // Base currency (default: 'USD' for this library, Fixer default: 'EUR')
       timeout: 10000, // Request timeout in ms (optional)
+      baseUrl: 'https://data.fixer.io/api', // Optional — paid plans only, see below
     }),
   },
 })
 ```
+
+- **Any `base` works on every plan.** Fixer's free plan only quotes EUR, so the exchange always
+  requests EUR and derives the base you configured (or pass per call) locally — the same single
+  request, and the rates really are "units per 1 `base`".
+- **`baseUrl`** defaults to `http://data.fixer.io/api` because the free plan does not include HTTPS.
+  On a paid plan set it to `https://data.fixer.io/api`; over HTTP the access key is sent in clear text.
 
 ## ⚙️ Configuration
 

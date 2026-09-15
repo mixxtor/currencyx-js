@@ -76,6 +76,11 @@ export interface GoogleFinanceConfig extends BaseConfig {}
 
 export interface FixerConfig extends BaseConfig {
   accessKey: string
+  /**
+   * API root. Defaults to `http://data.fixer.io/api` — the only scheme the free plan serves. Use
+   * `https://data.fixer.io/api` on a paid plan so the access key is not sent in clear text.
+   */
+  baseUrl?: string
 }
 
 /**
