@@ -104,27 +104,45 @@ interface ExchangeRatesResult {
 Shorthand for getting rates:
 
 ```typescript
-const rates = await currency.latestRates({ base: 'USD', codes: ['EUR', 'GBP'] })
+const rates = await currency.latestRates({
+  base: 'USD',
+  codes: ['EUR', 'GBP'],
+})
 ```
 
 ### Exchange Management
 
 ```typescript
-// Switch exchanges
+// Switch exchanges — `use()` also returns the instance
 currency.use('fixer')
+
+// Read one without switching the active exchange
+const fixer = currency.get('fixer')
 
 // Get current exchange provider
 const current = currency.getCurrentExchange() // 'fixer'
 
 // List available exchanges
 const exchanges = currency.getAvailableExchanges() // ['google', 'fixer']
+
+// Narrow an unknown string to a configured exchange name
+if (currency.has(name)) {
+  currency.use(name)
+}
 ```
+
+> `latestRates({ base })` applies that base to the one call only. Exchange instances are shared, so
+> to change an exchange's own default use `currency.get('fixer').setBase('EUR')`.
 
 ### Utility Methods
 
 ```typescript
 // Format currency (object parameters)
-const formatted = currency.formatCurrency({ amount: 1234.56, code: 'USD', locale: 'en-US' })
+const formatted = currency.formatCurrency({
+  amount: 1234.56,
+  code: 'USD',
+  locale: 'en-US',
+})
 // Result: "$1,234.56"
 
 // Round values
@@ -167,6 +185,10 @@ const rounded = currency.roundMoney(123.456, 'USD')
 // Automatically rounds according to USD rounding rules
 ```
 
+> The currency entries are shared by every caller and **frozen**: writing onto one throws a
+> `TypeError`. To decorate an entry, copy it — `{ ...currency.getByCode('USD'), rate }`. `getList()`
+> returns a new array each call, so sorting or filtering the result in place is safe.
+
 ## 🔌 Exchanges
 
 ### Google Finance Exchange
@@ -197,10 +219,17 @@ const currency = createCurrency({
       accessKey: 'your-api-key', // Required: Your Fixer.io API key
       base: 'USD', // Base currency (default: 'USD' for this library, Fixer default: 'EUR')
       timeout: 10000, // Request timeout in ms (optional)
+      baseUrl: 'https://data.fixer.io/api', // Optional — paid plans only, see below
     }),
   },
 })
 ```
+
+- **Any `base` works on every plan.** Fixer's free plan only quotes EUR, so the exchange always
+  requests EUR and derives the base you configured (or pass per call) locally — the same single
+  request, and the rates really are "units per 1 `base`".
+- **`baseUrl`** defaults to `http://data.fixer.io/api` because the free plan does not include HTTPS.
+  On a paid plan set it to `https://data.fixer.io/api`; over HTTP the access key is sent in clear text.
 
 ## ⚙️ Configuration
 
@@ -219,11 +248,19 @@ const currency = createCurrency({
 
 // Use Google Finance
 currency.use('google')
-const googleResult = await currency.convert({ amount: 100, from: 'USD', to: 'EUR' })
+const googleResult = await currency.convert({
+  amount: 100,
+  from: 'USD',
+  to: 'EUR',
+})
 
 // Switch to Fixer.io
 currency.use('fixer')
-const fixerResult = await currency.convert({ amount: 100, from: 'USD', to: 'EUR' })
+const fixerResult = await currency.convert({
+  amount: 100,
+  from: 'USD',
+  to: 'EUR',
+})
 ```
 
 ### Type Safety
@@ -268,7 +305,87 @@ if (result.success) {
 
 ## 🔧 Custom Exchanges
 
-Extend the system with custom exchanges:
+### `createExchange()` — describe the API, get the exchange
+
+Most of an exchange is the same everywhere: cross rates, rebasing when the upstream publishes one
+fixed base, filtering when it ignores `symbols`, building result objects, mapping failures. Only the
+request and the response shape differ. `createExchange()` takes that difference and returns a
+`BaseCurrencyExchange` subclass with the rest implemented — the bundled `fixer` and `google`
+exchanges are written this way.
+
+**Table mode** — the API answers with a rate table:
+
+```typescript
+import { createExchange, CurrencyError, ConfigurationError } from '@mixxtor/currencyx-js'
+
+type MxConfig = { accessKey: string; base?: CurrencyCode; timeout?: number }
+
+export class MxExchange extends createExchange<MxConfig>({
+  name: 'mx',
+  defaults: { base: 'EUR', timeout: 5000 },
+
+  // Facts about the upstream, so the generated class can compensate:
+  //   base          → the ONLY base it publishes; every other base is derived locally
+  //   supportsCodes → false means it ignores `symbols`, so filtering happens here
+  upstream: { base: 'EUR', supportsCodes: false },
+
+  validate: (config) => {
+    if (!config.accessKey) throw new ConfigurationError('Mx exchange requires an accessKey')
+  },
+  setKey: (config, key) => (config.accessKey = key),
+
+  async fetchRates({ config, base, codes, currencies, signal }) {
+    const url = new URL('https://currencyrates.example.dev')
+    url.searchParams.set('access_key', config.accessKey)
+
+    const response = await fetch(url, { signal }) // `signal` already honours config.timeout
+    const data = await response.json()
+
+    if (!response.ok || !data.success) {
+      throw new CurrencyError(data.error ?? `HTTP ${response.status}`, response.status, 'INVALID_ACCESS_KEY')
+    }
+
+    return data.rates // just the table — "units of X per 1 base"
+  },
+}) {}
+```
+
+That is the whole exchange. `latestRates({ base, codes })`, `convert()`, `getConvertRate()`,
+rebasing, filtering and error results all come from the generated class.
+
+**Pair mode** — the API quotes one pair at a time (this is how `google` works):
+
+```typescript
+export class MyScraper extends createExchange({
+  name: 'scraper',
+  defaults: { base: 'USD' },
+  async fetchRate({ from, to, signal }) {
+    const response = await fetch(`https://example.test/${from}-${to}`, {
+      signal,
+    })
+    return response.ok ? parseRate(await response.text()) : undefined // undefined → code drops out
+  },
+}) {}
+```
+
+**Optional pieces**
+
+| Key                      | When to use it                                                                               |
+| ------------------------ | -------------------------------------------------------------------------------------------- |
+| `convert`                | The API has its own conversion endpoint (fixer does). Otherwise `amount × getConvertRate()`. |
+| `upstream.base`          | The API publishes exactly one base. Omit it when it honours the base you send.               |
+| `upstream.supportsCodes` | `false` when `symbols`/`codes` is ignored, so filtering happens locally.                     |
+| `validate` / `setKey`    | Reject an unusable config at construction; support `setKey()` rotation.                      |
+
+Throw any `CurrencyError` subclass from a spec callback (`ApiError`, `RateLimitError`,
+`ConfigurationError`, …) and its `code`/`type`/message land on the result's `error`. Anything else
+becomes a `FETCH_ERROR`.
+
+### Extending `BaseCurrencyExchange` directly
+
+Still fully supported, and the right choice for an API the spec cannot describe — several requests
+to assemble one table, its own caching layer, a non-HTTP transport. You implement `latestRates`,
+`convert` and `getConvertRate` yourself and get the protected helpers in return:
 
 ```typescript
 import { BaseCurrencyExchange } from '@mixxtor/currencyx-js'
@@ -283,51 +400,34 @@ class CustomExchange extends BaseCurrencyExchange {
     // Initialize with your config
   }
 
+  // Resolve the base per call — `this.base` is the instance default, `params.base` overrides it
+  // for that call only. Never assign to `this.base` in a request path: the instance is shared.
+  async latestRates(params?: ExchangeRatesParams) {
+    const base = this.resolveBase(params)
+    const rates = await this.fetchSomehow(base)
+
+    return this.createExchangeRatesResult(base, rates)
+  }
+
   async convert(params: ConvertParams) {
-    try {
-      // Your custom conversion logic
-      const rate = await this.getConvertRate(params.from, params.to)
-      const result = params.amount * rate
+    const rate = await this.getConvertRate(params.from, params.to)
 
-      return this.createConversionResult(params.amount, params.from, params.to, result, rate)
-    } catch (error) {
-      return this.createConversionResult(params.amount, params.from, params.to, undefined, undefined, {
-        info: error.message,
-        type: 'custom_error',
-      })
-    }
+    return rate === undefined
+      ? this.createConversionResult(params.amount, params.from, params.to, undefined, undefined, {
+          info: `No rate for ${params.from}-${params.to}`,
+          type: 'RATE_NOT_FOUND',
+        })
+      : this.createConversionResult(params.amount, params.from, params.to, params.amount * rate, rate)
   }
 
-  async latestRates(params: ExchangeRatesParams) {
-    try {
-      // Your custom rates logic
-      const rates = await this.fetchRatesFromAPI(params)
-
-      return this.createExchangeRatesResult(params.base, rates)
-    } catch (error) {
-      return this.createExchangeRatesResult(params.base, {}, { info: error.message, type: 'custom_error' })
-    }
-  }
-
-  async getConvertRate(from: string, to: string): Promise<number> {
-    // Implement your rate fetching logic
-    return 0.85 // Example rate
-  }
-
-  private async fetchRatesFromAPI(params: { base: string; codes?: string[] }) {
-    // Implement your API call logic
-    return { EUR: 0.85, GBP: 0.73 }
+  async getConvertRate(from: CurrencyCode, to: CurrencyCode) {
+    /* ... */
   }
 }
-
-// Use your custom exchange
-const currency = createCurrency({
-  default: 'custom',
-  exchanges: {
-    custom: new CustomExchange({ base: 'USD', apiKey: 'your-key' }),
-  },
-})
 ```
+
+Both routes produce the same thing — a `BaseCurrencyExchange` — so an exchange can start as a spec
+and be rewritten by hand later without its callers noticing.
 
 ## 📖 Examples
 

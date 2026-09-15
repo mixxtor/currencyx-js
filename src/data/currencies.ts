@@ -208,11 +208,23 @@ export const CURRENCIES = [
   { code: 'ZWL', numeric_code: '932', name: 'Zimbabwean dollar (fifth)', symbol: 'ZWL', round: 1, decimal: 0, delimiter: ',', short_format: 'ZWL {{amount}}', explicit_format: 'ZWL {{amount}}', countries: ['ZW'] },
 ] as const
 
+// The entries are typed readonly (`as const`) but were plain objects at runtime, and every lookup below
+// hands out the same instances to every caller in the process. A caller writing onto one — `entry.rate
+// = …` behind an `as any` — changed it for all later callers, across requests. Freezing makes that
+// write a TypeError (ESM is strict) instead of a silent, process-wide leak.
+for (const entry of CURRENCIES) {
+  Object.freeze(entry.countries)
+  Object.freeze(entry)
+}
+
 /**
  * Get all currencies
+ *
+ * Returns a new array on every call, so sorting or filtering the result in place never reorders the
+ * library's own list. The entries themselves are shared and frozen.
  */
 export function getList(): CurrencyInfo[] {
-  return CURRENCIES as unknown as CurrencyInfo[]
+  return [...CURRENCIES] as unknown as CurrencyInfo[]
 }
 
 /**
