@@ -10,11 +10,12 @@ on:
   workflow_dispatch:
     inputs:
       release_type:
-        description: 'Release type'
+        description: 'Release type (auto = derive the bump from conventional commits)'
         required: true
-        default: 'patch'
+        default: 'auto'
         type: choice
         options:
+          - auto
           - patch
           - minor
           - major
@@ -53,9 +54,12 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
+      # No increment argument: @release-it/conventional-changelog derives the bump from the commits
+      # since the last tag (feat → minor, feat!/BREAKING CHANGE → major, anything else → patch).
+      # `release:patch` here used to publish every merge as a patch, features included.
       - name: Release (Auto)
         if: github.event_name == 'push'
-        run: npm run release:patch
+        run: npm run release -- --ci
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
@@ -63,8 +67,14 @@ jobs:
 
       - name: Release (Manual)
         if: github.event_name == 'workflow_dispatch'
-        run: npm run release:${{ github.event.inputs.release_type }}
+        run: |
+          if [ "$RELEASE_TYPE" = "auto" ]; then
+            npm run release -- --ci
+          else
+            npm run "release:$RELEASE_TYPE" -- --ci
+          fi
         env:
+          RELEASE_TYPE: ${{ github.event.inputs.release_type }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

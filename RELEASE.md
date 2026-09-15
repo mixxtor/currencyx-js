@@ -17,7 +17,8 @@ The package uses **release-it** with **conventional commits** for automated rele
 #### **1. Automatic Release (Push to main/master)**
 
 ```bash
-# Any push to main/master triggers automatic patch release
+# Any push to main/master triggers a release. The bump is derived from the commits since the
+# last tag: feat → minor, feat!/fix!/BREAKING CHANGE → major, any other type → patch.
 git push origin main
 ```
 
@@ -25,13 +26,16 @@ git push origin main
 
 ```bash
 # Go to GitHub Actions → Release workflow → Run workflow
-# Choose release type: patch, minor, major
+# Choose release type: auto (derived from commits, the default), patch, minor, major
 ```
 
 #### **3. Local Release (Development)**
 
 ```bash
-# Patch release (2.0.0 → 2.0.1)
+# Bump derived from the commits since the last tag, same as CI
+npm run release
+
+# Patch release (2.0.0 → 2.0.1) — forces patch even when there are feat commits
 npm run release:patch
 
 # Minor release (2.0.0 → 2.1.0)
