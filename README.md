@@ -185,6 +185,10 @@ const rounded = currency.roundMoney(123.456, 'USD')
 // Automatically rounds according to USD rounding rules
 ```
 
+> The currency entries are shared by every caller and **frozen**: writing onto one throws a
+> `TypeError`. To decorate an entry, copy it — `{ ...currency.getByCode('USD'), rate }`. `getList()`
+> returns a new array each call, so sorting or filtering the result in place is safe.
+
 ## 🔌 Exchanges
 
 ### Google Finance Exchange
