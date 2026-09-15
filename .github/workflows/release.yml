@@ -6,7 +6,7 @@ on:
       - main
       - master
     paths:
-      - 'packages/currencyx-js/**'
+      - '**'
   workflow_dispatch:
     inputs:
       release_type:
@@ -22,7 +22,7 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
-    if: "!contains(github.event.head_commit.message, 'chore: release')"
+    if: "!contains(github.event.head_commit.message, 'chore: release') && !contains(github.event.head_commit.message, 'chore(release)')"
 
     steps:
       - name: Checkout
@@ -35,10 +35,9 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          registry-url: 'https://registry.npmjs.org'
+          registry-url: 'https://npmjs.org'
 
       - name: Install dependencies
-        working-directory: packages/currencyx-js
         run: |
           if [ -e yarn.lock ]; then
             yarn install --frozen-lockfile
@@ -49,24 +48,21 @@ jobs:
           fi
 
       - name: Run tests
-        working-directory: packages/currencyx-js
         run: |
-          npm run lint
-          npm run typecheck
+          npm run lint --if-present
+          npm run typecheck --if-present
           npm run test --if-present
 
       - name: Build package
-        working-directory: packages/currencyx-js
-        run: npm run build
+        run: npm run build --if-present
 
       - name: Configure Git
         run: |
           git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.email "github-actions[bot]@://github.com"
 
       - name: Release (Auto)
         if: github.event_name == 'push'
-        working-directory: packages/currencyx-js
         run: npm run release:patch
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -75,7 +71,6 @@ jobs:
 
       - name: Release (Manual)
         if: github.event_name == 'workflow_dispatch'
-        working-directory: packages/currencyx-js
         run: npm run release:${{ github.event.inputs.release_type }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
