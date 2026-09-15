@@ -78,7 +78,7 @@
     "eslint": "^10.8.1",
     "release-it": "^21.0.2",
     "tsup": "^8.5.1",
-    "typescript": "^6.0.3",
+    "typescript": "^7.0.2",
     "vitest": "^5.0.0"
   },
   "release-it": {
