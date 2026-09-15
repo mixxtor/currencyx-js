@@ -4,6 +4,26 @@ All notable changes to this project will be documented in this file.
 
 
 
+## [2.5.2](https://github.com/mixxtor/currencyx-js/compare/v2.5.0...v2.5.2) (2026-09-15)
+
+### 🐛 Bug Fixes
+
+* quote Fixer in EUR and derive the configured base locally ([1755be7](https://github.com/mixxtor/currencyx-js/commit/1755be77a600014a2252ff24670d7bc8e8c6227e))
+* request the target base when rebasing a filtered table ([9bc9e7f](https://github.com/mixxtor/currencyx-js/commit/9bc9e7f38629d5ab634da0013304daf21da312d8))
+* stop callers mutating the shared currency list ([4249d43](https://github.com/mixxtor/currencyx-js/commit/4249d43bb371052f7f523c5ad7ab5e5abfe271dc))
+
+### 🔧 Maintenance
+
+* **deps-dev:** bump @vitest/coverage-v8 from 4.1.11 to 5.0.0 ([b54d841](https://github.com/mixxtor/currencyx-js/commit/b54d84123337915962546f7c0680bf9356915e0a))
+* **deps-dev:** bump typescript from 6.0.3 to 7.0.2 ([8d5c29a](https://github.com/mixxtor/currencyx-js/commit/8d5c29a30f7045a8acf7302838b90f924fd615bd))
+* **deps-dev:** bump vitest and @vitest/coverage-v8 to 5, test on Node 22 and 24 ([4017e23](https://github.com/mixxtor/currencyx-js/commit/4017e23b8756eb47b4f14ebc31d9a46848519c1a))
+* **deps-dev:** bump vitest from 4.1.11 to 5.0.0 ([8c2b999](https://github.com/mixxtor/currencyx-js/commit/8c2b999eaec72ccb80bf69817dfad2e97e4ac0ca))
+* **deps:** update devDependencies to latest versions ([54175d7](https://github.com/mixxtor/currencyx-js/commit/54175d7793cfab69ff256f4c5b22a4f198647b57))
+* **release:** bump version to 2.5.1 ([e09b984](https://github.com/mixxtor/currencyx-js/commit/e09b9846cca7d1323168534144e30cf484ff1e13))
+* remove registry specification from release commands ([ea49139](https://github.com/mixxtor/currencyx-js/commit/ea491399a5c95137d0294ca776ec382779e7872a))
+* streamline release workflow and fix email configuration ([8c0824b](https://github.com/mixxtor/currencyx-js/commit/8c0824ba1f89d70ba4820a8fb91ef7fe5718be4e))
+* update release workflow to include all paths and improve conditions ([d257578](https://github.com/mixxtor/currencyx-js/commit/d25757802ce84ed753be10771e5757724d71cf07))
+
 ## [2.5.0](https://github.com/mixxtor/currencyx-js/compare/v2.4.0...v2.5.0) (2026-08-18)
 
 ### ✨ Features
