@@ -83,6 +83,52 @@ describe('createExchange — table mode', () => {
   })
 })
 
+describe('createExchange — rebasing an upstream that honours `symbols`', () => {
+  /** EUR upstream that filters to the requested symbols and, like Fixer, leaves its own base out. */
+  function upstream() {
+    const table: Record<string, number> = { USD: 1.1, GBP: 0.85, VND: 30000 }
+    const fetchRates = vi.fn(async ({ codes }: { codes?: CurrencyCode[] }) =>
+      codes ? Object.fromEntries(Object.entries(table).filter(([code]) => codes.includes(code))) : { ...table },
+    )
+    const Exchange = createExchange<TestConfig>({
+      name: 'symbols',
+      defaults: { base: 'USD' as CurrencyCode },
+      upstream: { base: 'EUR' },
+      fetchRates,
+    })
+
+    return { Exchange, fetchRates }
+  }
+
+  it('requests the target base alongside a code filter, so the rebase has a divisor', async () => {
+    const { Exchange, fetchRates } = upstream()
+
+    const result = await new Exchange().latestRates({ base: 'USD', codes: ['GBP'] })
+
+    expect(fetchRates.mock.calls[0][0].codes).toEqual(['GBP', 'USD'])
+    expect(result.success).toBe(true)
+    expect(result.rates).toEqual({ GBP: 0.85 / 1.1 })
+  })
+
+  it('passes the code filter through untouched when no rebase is needed', async () => {
+    const { Exchange, fetchRates } = upstream()
+
+    await new Exchange().latestRates({ base: 'EUR', codes: ['GBP'] })
+
+    expect(fetchRates.mock.calls[0][0].codes).toEqual(['GBP'])
+  })
+
+  it('keeps the upstream base in a rebased table even when the upstream omits it', async () => {
+    const { Exchange } = upstream()
+
+    const result = await new Exchange().latestRates()
+
+    expect(result.base).toBe('USD')
+    expect(result.rates.USD).toBe(1)
+    expect(result.rates.EUR).toBeCloseTo(1 / 1.1, 12)
+  })
+})
+
 describe('createExchange — pair mode', () => {
   const fetchRate = vi.fn(async ({ from, to }: { from: CurrencyCode; to: CurrencyCode }) =>
     from === 'USD' && to === 'GBP' ? 0.77 : undefined,

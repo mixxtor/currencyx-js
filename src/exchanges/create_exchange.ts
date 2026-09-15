@@ -254,17 +254,25 @@ export function createExchange<Config extends BaseConfig = BaseConfig>(
     async #tableRates(base: CurrencyCode, codes?: CurrencyCode[]): Promise<Record<string, number>> {
       const upstreamBase = spec.upstream?.base ?? base
       const supportsCodes = spec.upstream?.supportsCodes ?? true
+      const rebasing = upstreamBase !== base
+
+      // Rebasing divides through `rates[base]`, so the requested base has to be in the table even
+      // when the caller did not ask for it. Without this, `latestRates({ base: 'USD', codes: ['GBP'] })`
+      // against an EUR-only upstream asked for GBP alone and failed as "Unsupported base currency".
+      const requested = supportsCodes && codes?.length ? (rebasing ? [...new Set([...codes, base])] : codes) : undefined
 
       const fetched = await spec.fetchRates!({
         config: this.config,
         signal: this.#signal(),
         base: upstreamBase,
-        codes: supportsCodes ? codes : undefined,
+        codes: requested,
         currencies: this.currencies,
       })
 
-      let rates = fetched
-      if (upstreamBase !== base) {
+      // Many APIs leave their own base out of the table (it is 1 by definition). Put it back, or a
+      // rebased table silently loses that currency — a USD table from an EUR upstream had no EUR.
+      let rates: Record<string, number> = { [upstreamBase]: 1, ...fetched }
+      if (rebasing) {
         const divisor = rates[base]
         if (!divisor) {
           throw new CurrencyError(`Unsupported base currency: ${base}`, 400, 'UNSUPPORTED_CURRENCY')
